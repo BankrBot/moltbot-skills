@@ -20,6 +20,10 @@ moltbot-skills/
 │   └── scripts/
 │       └── bankr.sh
 │
+├── clawdia/                      # Clawdia (community)
+│   └── x-engagement/
+│       └── SKILL.md
+│
 ├── base/                         # Base (placeholder)
 │   └── SKILL.md
 ├── neynar/                       # Neynar (placeholder)
@@ -33,6 +37,7 @@ moltbot-skills/
 | Provider | Skill | Description |
 |----------|-------|-------------|
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
+| [clawdia](https://x.com/Clawdia_ETH) | [x-engagement](clawdia/x-engagement/) | Twitter/X engagement skill for AI agents. Algorithm optimization, automated account setup, engagement patterns. |
 | base | — | Placeholder |
 | neynar | — | Placeholder |
 | zapper | — | Placeholder |

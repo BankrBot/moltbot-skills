@@ -9,9 +9,18 @@ VENV_PATH="$HOME/cua-env/bin/activate"
 # Ensure log directory exists
 mkdir -p "$LOG_DIR"
 
-# Export API keys (must be set via environment variable)
+# Load API key from .env file (if not already set)
+if [ -z "$BANKRBOT_API_KEY" ] && [ -f "$SCRIPT_DIR/.env" ]; then
+    echo "[$(date)] Loading API key from .env file..."
+    source "$SCRIPT_DIR/.env"
+fi
+
+# Export API keys (must be set via environment variable or .env file)
 if [ -z "$BANKRBOT_API_KEY" ]; then
-    echo "❌ Error: BANKRBOT_API_KEY environment variable not set"
+    echo "❌ Error: BANKRBOT_API_KEY not set"
+    echo "Either:"
+    echo "  1. Set environment variable: export BANKRBOT_API_KEY='your_key'"
+    echo "  2. Create .env file in script directory with: export BANKRBOT_API_KEY=your_key"
     echo "Get your API key at: https://bankr.bot"
     exit 1
 fi

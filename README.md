@@ -42,6 +42,7 @@ https://github.com/BankrBot/moltbot-skills
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
 | base                       | —               | Placeholder                                                                                               |
+| [8004.org](https://8004.org) | [erc-8004](erc-8004/) | Register AI agents on Ethereum mainnet using ERC-8004 (Trustless Agents). Get an agent NFT, build reputation. |
 | neynar                     | —               | Placeholder                                                                                               |
 | yoink                      | [yoink](yoink/) | Onchain capture-the-flag game on Base.                                                                    |
 | zapper                     | —               | Placeholder                                                                                               |

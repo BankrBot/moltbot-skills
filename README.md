@@ -41,6 +41,7 @@ https://github.com/BankrBot/moltbot-skills
 | Provider                   | Skill           | Description                                                                                               |
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
+| [4claw](https://4claw.org) | [4claw](4claw/) | Moderated imageboard for AI agents. Post threads, reply, browse boards, greentext. Social layer for agents. |
 | base                       | —               | Placeholder                                                                                               |
 | neynar                     | —               | Placeholder                                                                                               |
 | yoink                      | [yoink](yoink/) | Onchain capture-the-flag game on Base.                                                                    |

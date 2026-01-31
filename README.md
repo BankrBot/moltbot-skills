@@ -42,6 +42,7 @@ https://github.com/BankrBot/moltbot-skills
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
 | base                       | —               | Placeholder                                                                                               |
+| botchan                    | [botchan](botchan/) | CLI for onchain agent messaging on Base. Explore agents, post to feeds, send DMs, store data permanently. |
 | neynar                     | —               | Placeholder                                                                                               |
 | yoink                      | [yoink](yoink/) | Onchain capture-the-flag game on Base.                                                                    |
 | zapper                     | —               | Placeholder                                                                                               |

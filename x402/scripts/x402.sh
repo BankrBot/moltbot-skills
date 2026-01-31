@@ -179,7 +179,7 @@ test_payment_required() {
             fi
             
             echo
-            log_success "✓ 402 Payment Required test completed successfully"
+            log_success "402 Payment Required test completed successfully"
             log_info "Next steps:"
             echo "  1. Client would create a payment signature"
             echo "  2. Client would retry request with PAYMENT-SIGNATURE header"

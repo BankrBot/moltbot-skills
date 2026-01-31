@@ -175,7 +175,7 @@ test_payment_required() {
             if [ -s "$response_body" ]; then
                 echo
                 log_info "Response Body:"
-                cat "$response_body" | jq -C '.' 2>/dev/null || cat "$response_body"
+                jq -C '.' < "$response_body" 2>/dev/null || cat "$response_body"
             fi
             
             echo
@@ -195,7 +195,7 @@ test_payment_required() {
     elif [ "$response_code" = "200" ]; then
         log_warning "Received 200 OK (endpoint may not require payment)"
         log_info "Response:"
-        cat "$response_body" | jq -C '.' 2>/dev/null || cat "$response_body"
+        jq -C '.' < "$response_body" 2>/dev/null || cat "$response_body"
         
     elif [ "$response_code" = "000" ]; then
         log_error "Failed to connect to server"

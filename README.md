@@ -41,6 +41,7 @@ https://github.com/BankrBot/moltbot-skills
 | Provider                   | Skill           | Description                                                                                               |
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
+| [axiom](https://x.com/AxiomBot) | [uniswap-v4-lp](axiom/uniswap-v4-lp/) | Manage Uniswap V4 LP positions on Base. Add, remove, monitor, and burn concentrated liquidity positions. |
 | base                       | —               | Placeholder                                                                                               |
 | neynar                     | —               | Placeholder                                                                                               |
 | yoink                      | [yoink](yoink/) | Onchain capture-the-flag game on Base.                                                                    |

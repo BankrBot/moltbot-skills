@@ -59,6 +59,20 @@ If the script fails, call `setName(string)` on the Reverse Registrar:
 setName("yourname.eth")
 ```
 
+## Setting Avatars
+
+```bash
+# Set avatar (requires L1 transaction)
+./scripts/set-avatar.sh myname.eth https://example.com/avatar.png
+
+# Supported formats:
+# - HTTPS: https://example.com/image.png
+# - IPFS: ipfs://QmHash
+# - NFT: eip155:1/erc721:0xbc4ca.../1234
+```
+
+**Note:** Avatars are text records stored on Ethereum mainnet, so this requires ETH for gas on L1.
+
 ## Links
 
 - ENS Docs: https://docs.ens.domains/web/reverse

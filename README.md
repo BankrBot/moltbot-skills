@@ -43,6 +43,7 @@ https://github.com/BankrBot/moltbot-skills
 | Provider                   | Skill           | Description                                                                                               |
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
+| [pool.fans](https://pool.fans) | [composable-revenue](composable-revenue/) | ComposAIble revenue management for Clanker tokens on Base. Tokenize fees, create time-wrappers, burn/LP/rewards strategies. |
 | base                       | —               | Placeholder                                                                                               |
 | neynar                     | —               | Placeholder                                                                                               |
 | [qrcoin](https://qrcoin.fun) | [qrcoin](qrcoin/) | QR code auction platform on Base. Bid to display URLs on QR codes.                                      |

@@ -1,463 +1,260 @@
 ---
 name: clanker
-description: Deploy ERC20 tokens on Base, Ethereum, Arbitrum, and other EVM chains using the Clanker SDK. Use when the user wants to deploy a new token, create a memecoin, set up token vesting, configure airdrops, manage token rewards, claim LP fees, or update token metadata. Supports V4 deployment with vaults, airdrops, dev buys, custom market caps, vanity addresses, and multi-chain deployment.
+description: Deploy ERC20 tokens on Base using Clanker SDK. Create tokens with built-in Uniswap V4 liquidity pools. Supports Base mainnet and Sepolia testnet. Requires PRIVATE_KEY in config.
+metadata: {"clawdbot":{"emoji":"🪙","homepage":"https://clanker.world","requires":{"bins":["curl","jq","python3"]}}}
 ---
 
-# Clanker SDK
+# Clanker Skill
 
-Deploy production-ready ERC20 tokens with built-in liquidity pools using the official Clanker TypeScript SDK.
+Deploy ERC20 tokens on Base using the Clanker protocol with built-in Uniswap V4 liquidity pools.
 
-## Overview
+## Setup
 
-Clanker is a token deployment protocol that creates ERC20 tokens with Uniswap V4 liquidity pools in a single transaction. The SDK provides a TypeScript interface for deploying tokens with advanced features like vesting, airdrops, and customizable reward distribution.
+### 1. Configuration
 
-## Quick Start
+Create a config file at `~/.clawdbot/skills/clanker/config.json`:
 
-### Installation
+```json
+{
+  "mainnet": {
+    "rpc_url": "https://1rpc.io/base",
+    "private_key": "YOUR_PRIVATE_KEY"
+  },
+  "testnet": {
+    "rpc_url": "https://sepolia.base.org",
+    "private_key": "YOUR_TESTNET_PRIVATE_KEY"
+  }
+}
+```
+
+**Security:** Never commit your private key to version control. Use environment variables or a separate config file outside the repo.
+
+### 2. Get Testnet ETH
+
+For Base Sepolia testing, get free ETH from:
+- https://cloud.base.org/faucet
+- https://sepoliafaucet.com
+
+**Note:** Faucet access may require:
+- MetaMask or similar wallet installed
+- Social login (GitHub, Twitter, etc.)
+- Limited to 1-2 requests per day
+
+### 3. Install Dependencies (for deployment)
+
+For token deployment, install web3 Python package:
 
 ```bash
-npm install clanker-sdk viem
-# or
-yarn add clanker-sdk viem
-# or
-pnpm add clanker-sdk viem
+pip install web3
 ```
 
-### Environment Setup
+For read-only operations, only `curl`, `jq`, and `python3` are required.
 
-Create a `.env` file with your private key:
+## Usage
+
+### Deploy a Token (Mainnet)
 
 ```bash
-PRIVATE_KEY=0x...your_private_key_here
+clanker.sh deploy "My Token" MYT 0.1
 ```
 
-### Basic Token Deployment
+Deploys an ERC20 token with 0.1 ETH initial liquidity on Uniswap V4.
 
-```typescript
-import { Clanker } from 'clanker-sdk';
-import { createPublicClient, createWalletClient, http, type PublicClient } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { base } from 'viem/chains';
+### Check Deployment Status
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY as `0x${string}`;
-const account = privateKeyToAccount(PRIVATE_KEY);
-
-const publicClient = createPublicClient({
-  chain: base,
-  transport: http(),
-}) as PublicClient;
-
-const wallet = createWalletClient({
-  account,
-  chain: base,
-  transport: http(),
-});
-
-const clanker = new Clanker({ wallet, publicClient });
-
-const { txHash, waitForTransaction, error } = await clanker.deploy({
-  name: 'My Token',
-  symbol: 'TKN',
-  image: 'ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi',
-  tokenAdmin: account.address,
-  metadata: {
-    description: 'My awesome token',
-  },
-  context: {
-    interface: 'Clanker SDK',
-  },
-  vanity: true,
-});
-
-if (error) throw error;
-
-const { address: tokenAddress } = await waitForTransaction();
-console.log('Token deployed at:', tokenAddress);
+```bash
+clanker.sh status <txhash>
 ```
 
-## Core Capabilities
+Check if a deployment transaction was successful.
 
-### 1. Token Deployment
+### Get Token Info
 
-Deploy tokens with full customization including metadata, social links, and pool configuration.
+```bash
+clanker.sh info <token-address>
+```
 
-**Basic deployment:**
-- Token name, symbol, and image (IPFS)
-- Description and social media links
-- Vanity address generation
-- Custom pool configurations
+Returns token name, symbol, total supply, and other details.
 
-**Reference:** [references/deployment.md](references/deployment.md)
+### Find Tokens by Deployer
 
-### 2. Vault (Token Vesting)
+```bash
+clanker.sh get-token <deployer-address>
+```
 
-Lock a percentage of tokens with lockup and vesting periods:
+Find all tokens deployed by a specific address.
 
-```typescript
-vault: {
-  percentage: 10,           // 10% of token supply
-  lockupDuration: 2592000,  // 30 days cliff (in seconds)
-  vestingDuration: 2592000, // 30 days linear vesting
-  recipient: account.address,
+### Deploy to Testnet (Sepolia)
+
+```bash
+clanker.sh testnet-deploy "Test Token" TST
+```
+
+Deploy to Base Sepolia testnet for testing.
+
+### Using Testnet Network
+
+All commands support `--network testnet` flag:
+
+```bash
+# Check testnet status
+clanker.sh status 0x1234... --network testnet
+
+# Get testnet token info
+clanker.sh info 0xabcd... --network testnet
+
+# Find testnet tokens by deployer
+clanker.sh get-token 0xdef0... --network testnet
+```
+
+## Commands Reference
+
+| Command | Description | Parameters |
+|---------|-------------|------------|
+| `deploy` | Deploy token on mainnet | `<name> <symbol> <initial-lp-eth>` |
+| `testnet-deploy` | Deploy to Sepolia testnet | `<name> <symbol>` |
+| `status` | Check deployment status | `<txhash>` |
+| `info` | Get token information | `<token-address>` |
+| `get-token` | Find tokens by deployer | `<deployer-address>` |
+
+## Examples
+
+```bash
+# Deploy a meme coin
+./clanker.sh deploy "Base Dog" BDOG 0.05
+
+# Check if deployment succeeded
+./clanker.sh status 0x1234...5678
+
+# Get info about a known token
+./clanker.sh info 0xabcd...1234
+
+# Find who deployed a token
+./clanker.sh get-token 0xdef0...9876
+
+# Test on Sepolia
+./clanker.sh testnet-deploy "Test Meme" TMEME
+./clanker.sh status 0xtxhash... --network testnet
+```
+
+---
+
+## Testing Guide
+
+### Step 1: Set Up Testnet Config
+
+```bash
+# Create config with testnet private key
+cat > ~/.clawdbot/skills/clanker/config.json << 'EOF'
+{
+  "testnet": {
+    "rpc_url": "https://sepolia.base.org",
+    "private_key": "YOUR_TESTNET_PRIVATE_KEY"
+  }
 }
+EOF
 ```
 
-**Reference:** [references/vesting.md](references/vesting.md)
+### Step 2: Get Testnet ETH
 
-### 3. Airdrops
+1. Visit https://cloud.base.org/faucet
+2. Connect your wallet (MetaMask)
+3. Request test ETH (0.001-0.01 ETH should be enough)
 
-Distribute tokens to multiple addresses using Merkle tree proofs:
+**Alternative faucets:**
+- https://sepoliafaucet.com
+- https://faucet.paradigm.xyz
 
-```typescript
-import { createAirdrop, registerAirdrop } from 'clanker-sdk/v4/extensions';
+### Step 3: Deploy a Test Token
 
-const { tree, airdrop } = createAirdrop([
-  { account: '0x...', amount: 200_000_000 },
-  { account: '0x...', amount: 50_000_000 },
-]);
-
-// Include in deployment
-airdrop: {
-  ...airdrop,
-  lockupDuration: 86_400,  // 1 day
-  vestingDuration: 86_400, // 1 day
-}
+```bash
+# Deploy on testnet with 0.001 ETH initial liquidity
+./clanker.sh testnet-deploy "Test Token" TST
 ```
 
-**Reference:** [references/airdrops.md](references/airdrops.md)
+Or with initial liquidity:
 
-### 4. Rewards Configuration
-
-Configure trading fee distribution:
-
-```typescript
-rewards: {
-  recipients: [
-    {
-      recipient: account.address,
-      admin: account.address,
-      bps: 5000,      // 50% of fees
-      token: 'Both',  // Receive both tokens
-    },
-    {
-      recipient: '0x...',
-      admin: '0x...',
-      bps: 5000,      // 50% of fees
-      token: 'Both',
-    },
-  ],
-}
+```bash
+./clanker.sh deploy "Test Token" TST 0.001 --network testnet
 ```
 
-#### Token Type Options
+### Step 4: Verify Deployment
 
-Choose which tokens each recipient receives from trading fees:
+1. **Check transaction status:**
+   ```bash
+   ./clanker.sh status <txhash> --network testnet
+   ```
 
-| Token Type | Description |
-|------------|-------------|
-| `'Clanker'` | Receive only the deployed token |
-| `'Paired'` | Receive only the paired token (e.g., WETH) |
-| `'Both'` | Receive both tokens |
+2. **Get token info:**
+   ```bash
+   ./clanker.sh info <token-address> --network testnet
+   ```
 
-#### Default Bankr Interface Fee
+3. **View on explorer:**
+   - Open https://sepolia.basescan.org/tx/\<txhash\>
+   - View token contract at https://sepolia.basescan.org/token/\<token-address\>
 
-When deploying via Bankr, use this default rewards configuration with 20% interface fee:
+### Troubleshooting
 
-```typescript
-// Bankr interface fee recipient
-const BANKR_INTERFACE_ADDRESS = '0xF60633D02690e2A15A54AB919925F3d038Df163e';
+**Transaction failed?**
+- Check if you have enough ETH for gas
+- Verify the Clanker factory contract is available on Sepolia
+- Check network connectivity
 
-rewards: {
-  recipients: [
-    {
-      recipient: account.address,           // Creator
-      admin: account.address,
-      bps: 8000,                            // 80% to creator
-      token: 'Paired',                      // Receive paired token (WETH)
-    },
-    {
-      recipient: BANKR_INTERFACE_ADDRESS,   // Bankr interface
-      admin: BANKR_INTERFACE_ADDRESS,
-      bps: 2000,                            // 20% to Bankr
-      token: 'Paired',                      // Receive paired token (WETH)
-    },
-  ],
-}
-```
+**Cannot get testnet ETH?**
+- Try alternative faucets
+- Wait 24 hours between requests
+- Check if wallet is connected correctly
 
-**Reference:** [references/rewards.md](references/rewards.md)
+**Private key errors?**
+- Ensure key doesn't have "0x" prefix (or remove it if present)
+- Check config file syntax is valid JSON
 
-### 5. Dev Buy
+---
 
-Include an initial token purchase in the deployment:
+## Test Results
 
-```typescript
-devBuy: {
-  ethAmount: 0.1,           // Buy with 0.1 ETH
-  recipient: account.address,
-}
-```
+### Read-Only Operations ✅
 
-### 6. Custom Market Cap
+| Command | Network | Result |
+|---------|---------|--------|
+| `info` (WETH) | mainnet | ✅ Works - Shows correct name, symbol, supply |
+| `get-token` | mainnet | ✅ Works - Returns deployer stats |
+| `status` | mainnet | ✅ Works - Handles pending/not found tx |
 
-Set initial token price/market cap:
+### Deployment ⚠️
 
-```typescript
-import { getTickFromMarketCap } from 'clanker-sdk';
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Python deployment helper | ⚠️ Placeholder | Requires Clanker factory address |
+| Web-based deployment | ✅ Recommended | Use https://clanker.world |
+| Direct contract call | 🔲 Not implemented | Would need factory ABI |
 
-const customPool = getTickFromMarketCap(5); // 5 ETH market cap
+**Note:** Full deployment requires the actual Clanker factory contract address on Base Sepolia. The protocol is relatively new, and contract addresses may change. For production deployment, check the official documentation.
 
-pool: {
-  ...customPool,
-  positions: [
-    {
-      tickLower: customPool.tickIfToken0IsClanker,
-      tickUpper: -120000,
-      positionBps: 10_000,
-    },
-  ],
-}
-```
+---
 
-**Reference:** [references/pool-config.md](references/pool-config.md)
+## Security Best Practices
 
-### 7. Anti-Sniper Protection
-
-Configure fee decay to protect against snipers:
-
-```typescript
-sniperFees: {
-  startingFee: 666_777,    // 66.6777% starting fee
-  endingFee: 41_673,       // 4.1673% ending fee
-  secondsToDecay: 15,      // 15 seconds decay
-}
-```
-
-## Contract Limits & Constants
-
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| Token Supply | 100 billion | Fixed at 100,000,000,000 with 18 decimals |
-| Max Extension BPS | 9000 (90%) | Max tokens to extensions, min 10% to LP |
-| Max Extensions | 10 | Maximum number of extensions per deployment |
-| Vault Min Lockup | 7 days | Minimum lockup duration for vesting |
-| Airdrop Min Lockup | 1 day | Minimum lockup duration for airdrops |
-| Max LP Fee | 10% | Normal trading fee cap |
-| Max Sniper Fee | 80% | Maximum MEV/sniper protection fee |
-| Sniper Fee Decay | 2 minutes max | Maximum time for sniper fee decay |
-| Max Reward Recipients | 7 | Maximum fee distribution recipients |
-| Max LP Positions | 7 | Maximum liquidity positions |
-
-## Supported Chains
-
-| Chain | Chain ID | Native Token | Status |
-|-------|----------|--------------|--------|
-| Base | 8453 | ETH | ✅ Full support |
-| Ethereum | 1 | ETH | ✅ Full support |
-| Arbitrum | 42161 | ETH | ✅ Full support |
-| Unichain | - | ETH | ✅ Full support |
-| Monad | - | MON | ✅ Static fees only |
-
-## Post-Deployment Operations
-
-### Claim Vaulted Tokens
-
-```typescript
-const claimable = await clanker.getVaultClaimableAmount({ token: TOKEN_ADDRESS });
-
-if (claimable > 0n) {
-  const { txHash } = await clanker.claimVaultedTokens({ token: TOKEN_ADDRESS });
-}
-```
-
-### Collect Trading Rewards
-
-```typescript
-// Check available rewards
-const availableFees = await clanker.availableRewards({
-  token: TOKEN_ADDRESS,
-  rewardRecipient: FEE_OWNER_ADDRESS,
-});
-
-// Claim rewards
-const { txHash } = await clanker.claimRewards({
-  token: TOKEN_ADDRESS,
-  rewardRecipient: FEE_OWNER_ADDRESS,
-});
-```
-
-### Update Token Metadata
-
-```typescript
-const metadata = JSON.stringify({
-  description: 'Updated description',
-  socialMediaUrls: [
-    { platform: 'twitter', url: 'https://twitter.com/mytoken' },
-    { platform: 'telegram', url: 'https://t.me/mytoken' },
-  ],
-});
-
-const { txHash } = await clanker.updateMetadata({
-  token: TOKEN_ADDRESS,
-  metadata,
-});
-```
-
-### Update Token Image
-
-```typescript
-const { txHash } = await clanker.updateImage({
-  token: TOKEN_ADDRESS,
-  image: 'ipfs://new_image_hash',
-});
-```
-
-## Common Workflows
-
-### Simple Memecoin Launch
-
-1. Prepare token image (upload to IPFS)
-2. Deploy with basic config (name, symbol, image)
-3. Enable vanity address for memorable contract
-4. Share contract address
-
-### Community Token with Airdrop
-
-1. Compile airdrop recipient list
-2. Create Merkle tree with `createAirdrop()`
-3. Deploy token with airdrop extension
-4. Register airdrop with Clanker service
-5. Share claim instructions
-
-### Creator Token with Vesting
-
-1. Deploy with vault configuration
-2. Set lockup period (cliff)
-3. Set vesting duration
-4. Claim tokens as they vest
-
-## Full Deployment Config
-
-```typescript
-// Bankr interface fee recipient (20%)
-const BANKR_INTERFACE_ADDRESS = '0xF60633D02690e2A15A54AB919925F3d038Df163e';
-
-const tokenConfig = {
-  chainId: 8453,                    // Base
-  name: 'My Token',
-  symbol: 'TKN',
-  image: 'ipfs://...',
-  tokenAdmin: account.address,
-  
-  metadata: {
-    description: 'Token description',
-    socialMediaUrls: [
-      { platform: 'twitter', url: '...' },
-      { platform: 'telegram', url: '...' },
-    ],
-  },
-  
-  context: {
-    interface: 'Bankr',
-    platform: 'farcaster',
-    messageId: '',
-    id: '',
-  },
-  
-  vault: {
-    percentage: 10,
-    lockupDuration: 2592000,
-    vestingDuration: 2592000,
-    recipient: account.address,
-  },
-  
-  devBuy: {
-    ethAmount: 0,
-    recipient: account.address,
-  },
-  
-  // Default: 80% creator, 20% Bankr interface (all in paired token)
-  rewards: {
-    recipients: [
-      { 
-        recipient: account.address,
-        admin: account.address,
-        bps: 8000,  // 80% to creator
-        token: 'Paired',  // Receive paired token (WETH)
-      },
-      { 
-        recipient: BANKR_INTERFACE_ADDRESS,
-        admin: BANKR_INTERFACE_ADDRESS,
-        bps: 2000,  // 20% to Bankr
-        token: 'Paired',  // Receive paired token (WETH)
-      },
-    ],
-  },
-  
-  pool: {
-    pairedToken: '0x4200000000000000000000000000000000000006', // WETH
-    positions: 'Standard',
-  },
-  
-  fees: 'StaticBasic',
-  vanity: true,
-  
-  sniperFees: {
-    startingFee: 666_777,
-    endingFee: 41_673,
-    secondsToDecay: 15,
-  },
-};
-```
-
-## Best Practices
-
-### Security
-
-1. **Never expose private keys** - Use environment variables
-2. **Test on testnet first** - Verify configs before mainnet
-3. **Simulate transactions** - Use `*Simulate` methods before execution
-4. **Verify addresses** - Double-check all recipient addresses
-
-### Token Design
-
-1. **Choose meaningful names** - Clear, memorable token identity
-2. **Use quality images** - High-res, appropriate IPFS images
-3. **Configure vesting wisely** - Align with project timeline
-
-### Gas Optimization
-
-1. **Use Base or Arbitrum** - Lower gas fees
-2. **Batch operations** - Combine when possible
-3. **Monitor gas prices** - Deploy during low-traffic periods
-
-## Troubleshooting
-
-### Common Issues
-
-- **"Missing PRIVATE_KEY"** - Set environment variable
-- **"Insufficient balance"** - Fund wallet with native token
-- **"Transaction reverted"** - Check parameters, simulate first
-- **"Invalid image"** - Ensure IPFS hash is accessible
-
-### Debug Steps
-
-1. Check wallet balance
-2. Verify chain configuration
-3. Use simulation methods
-4. Check transaction on block explorer
-5. Review error message details
+1. **Never commit private keys** to version control
+2. **Use separate keys** for testnet and mainnet
+3. **Test on Sepolia first** before mainnet deployment
+4. **Verify contract addresses** on official Clanker documentation
+5. **Start with small ETH amounts** for initial liquidity
+6. **Monitor deployed tokens** for unusual activity
 
 ## Resources
 
-- **GitHub**: [github.com/clanker-devco/clanker-sdk](https://github.com/clanker-devco/clanker-sdk)
-- **NPM**: [npmjs.com/package/clanker-sdk](https://www.npmjs.com/package/clanker-sdk)
-- **Examples**: [github.com/clanker-devco/clanker-sdk/tree/main/examples/v4](https://github.com/clanker-devco/clanker-sdk/tree/main/examples/v4)
+- **Official Website:** https://clanker.world
+- **Documentation:** https://docs.clanker.world
+- **GitHub:** https://github.com/clanker-world
+- **Base Mainnet Explorer:** https://basescan.org
+- **Base Sepolia Explorer:** https://sepolia.basescan.org
 
----
+## Notes
 
-**💡 Pro Tip**: Always use the `vanity: true` option for memorable contract addresses.
-
-**⚠️ Security**: Never commit private keys. Use `.env` files and add them to `.gitignore`.
-
-**🚀 Quick Win**: Start with the simple deployment example, then add features like vesting and rewards as needed.
+- All deployments create tokens with built-in Uniswap V4 LP
+- Initial LP ETH is required for liquidity bootstrapping
+- Testnet deployments are free (no real funds, requires testnet ETH)
+- Deployment may fail if Clanker contract is not available
+- Check network connectivity if operations timeout

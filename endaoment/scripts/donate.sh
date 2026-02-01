@@ -60,7 +60,7 @@ CODE=$(curl -s -X POST "$RPC_URL" \
 
 # Function selectors
 APPROVE_SELECTOR="095ea7b3"  # approve(address,uint256)
-DONATE_SELECTOR="9fadbc36"   # donate(uint256)
+DONATE_SELECTOR="f14faf6f"   # donate(uint256)
 DEPLOY_SELECTOR="db9e30cc"   # deployOrgAndDonate(bytes32,uint256)
 
 echo ""

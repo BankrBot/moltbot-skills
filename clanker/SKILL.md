@@ -11,6 +11,11 @@ Deploy production-ready ERC20 tokens with built-in Uniswap V4 liquidity pools us
 1. CLI helper for Base mainnet / Base Sepolia (quick deploy + read-only)
 2. TypeScript SDK for multi-chain deployments and advanced features
 
+## Implementation Status
+
+- Implemented: Base CLI helper (`clanker/scripts/clanker.sh` + `clanker/scripts/deploy.py`) for deploy + read-only queries
+- Documented: SDK features (airdrop, vesting, rewards, pool config, metadata updates) via `references/*.md`
+
 ## Option A: CLI Helper (Base Only)
 
 ### Setup

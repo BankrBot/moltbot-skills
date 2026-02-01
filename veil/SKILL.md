@@ -11,6 +11,7 @@ This skill wraps the `@veil-cash/sdk` CLI to make Veil operations agent-friendly
 ## What it does
 
 - **Key management**: generate and store a Veil keypair locally
+- **Status check**: verify configuration, registration, and relay health
 - **Balances**: combined `balance`, `queue-balance`, `private-balance`
 - **Deposits via Bankr**: build a **Bankr-compatible unsigned transaction** and ask Bankr to sign & submit it
 - **Private actions**: `withdraw`, `transfer`, `merge` are executed locally using `VEIL_KEY` (ZK/proof flow)
@@ -69,25 +70,31 @@ scripts/veil-init.sh
 scripts/veil-keypair.sh
 ```
 
-### 5) Find your Bankr Base address
+### 5) Check your setup
+
+```bash
+scripts/veil-status.sh
+```
+
+### 6) Find your Bankr Base address
 
 ```bash
 scripts/veil-bankr-prompt.sh "What is my Base wallet address? Respond with just the address."
 ```
 
-### 6) Check balances
+### 7) Check balances
 
 ```bash
 scripts/veil-balance.sh --address 0xYOUR_BANKR_ADDRESS
 ```
 
-### 7) Deposit via Bankr (sign & submit)
+### 8) Deposit via Bankr (sign & submit)
 
 ```bash
 scripts/veil-deposit-via-bankr.sh 0.011 --address 0xYOUR_BANKR_ADDRESS
 ```
 
-### 8) Withdraw (private → public)
+### 9) Withdraw (private → public)
 
 ```bash
 scripts/veil-withdraw.sh 0.007 0xYOUR_BANKR_ADDRESS

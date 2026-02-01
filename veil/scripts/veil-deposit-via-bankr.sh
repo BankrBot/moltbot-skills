@@ -8,6 +8,6 @@ source "$SCRIPT_DIR/_common.sh"
 AMOUNT="${1:?amount required}"
 shift || true
 
-TX_JSON=$(veil_cli deposit "$AMOUNT" --unsigned --quiet "$@")
+TX_JSON=$(veil_cli deposit ETH "$AMOUNT" --unsigned --quiet "$@")
 
 echo "$TX_JSON" | "$SCRIPT_DIR/veil-bankr-submit-tx.sh"

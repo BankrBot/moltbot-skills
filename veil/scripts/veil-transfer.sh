@@ -8,4 +8,4 @@ source "$SCRIPT_DIR/_common.sh"
 AMOUNT="${1:?amount required}"
 RECIPIENT="${2:?recipient address required}"
 
-veil_cli transfer "$AMOUNT" "$RECIPIENT" --quiet
+veil_cli transfer ETH "$AMOUNT" "$RECIPIENT" --quiet

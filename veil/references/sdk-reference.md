@@ -24,11 +24,41 @@ veil init --no-save    # Print keypair without saving
 
 ### `veil keypair`
 
-Generate and show a new keypair as JSON (does not save).
+Show current Veil keypair as JSON (from VEIL_KEY env).
 
 ```bash
 veil keypair
 # {"veilPrivateKey":"0x...","depositKey":"0x..."}
+```
+
+### `veil status`
+
+Check configuration and service status.
+
+```bash
+veil status
+```
+
+Output:
+```json
+{
+  "walletKey": { "found": true, "address": "0x..." },
+  "veilKey": { "found": true },
+  "depositKey": { "found": true, "key": "0x1234...abcd" },
+  "rpcUrl": { "found": false, "url": "https://mainnet.base.org" },
+  "registration": {
+    "checked": true,
+    "registered": true,
+    "matches": true,
+    "onChainKey": "0x..."
+  },
+  "relay": {
+    "checked": true,
+    "healthy": true,
+    "status": "ok",
+    "network": "mainnet"
+  }
+}
 ```
 
 ### `veil register`
@@ -41,14 +71,14 @@ veil register --json                       # JSON output
 veil register --unsigned --address 0x...   # Unsigned payload for agents
 ```
 
-### `veil deposit <amount>`
+### `veil deposit ETH <amount>`
 
 Deposit ETH into the privacy pool.
 
 ```bash
-veil deposit 0.1                    # Signs & sends (JSON output)
-veil deposit 0.1 --unsigned         # Unsigned payload for agents
-veil deposit 0.1 --quiet            # Suppress progress output
+veil deposit ETH 0.1                    # Signs & sends (JSON output)
+veil deposit ETH 0.1 --unsigned         # Unsigned payload for agents
+veil deposit ETH 0.1 --quiet            # Suppress progress output
 ```
 
 Output:
@@ -98,31 +128,31 @@ Output:
 }
 ```
 
-### `veil withdraw <amount> <recipient>`
+### `veil withdraw ETH <amount> <recipient>`
 
 Withdraw from the privacy pool to any public address.
 
 ```bash
-veil withdraw 0.05 0xRecipientAddress
-veil withdraw 0.05 0xRecipientAddress --quiet
+veil withdraw ETH 0.05 0xRecipientAddress
+veil withdraw ETH 0.05 0xRecipientAddress --quiet
 ```
 
-### `veil transfer <amount> <recipient>`
+### `veil transfer ETH <amount> <recipient>`
 
 Transfer privately to another registered Veil user.
 
 ```bash
-veil transfer 0.02 0xRecipientAddress
-veil transfer 0.02 0xRecipientAddress --quiet
+veil transfer ETH 0.02 0xRecipientAddress
+veil transfer ETH 0.02 0xRecipientAddress --quiet
 ```
 
-### `veil merge <amount>`
+### `veil merge ETH <amount>`
 
 Consolidate multiple small UTXOs into one (self-transfer).
 
 ```bash
-veil merge 0.1                      # Merge UTXOs totaling 0.1 ETH
-veil merge 0.1 --quiet
+veil merge ETH 0.1                      # Merge UTXOs totaling 0.1 ETH
+veil merge ETH 0.1 --quiet
 ```
 
 ## Environment Variables
@@ -156,7 +186,7 @@ veil merge 0.1 --quiet
 Use `--unsigned` to get Bankr-compatible transaction payloads:
 
 ```bash
-veil deposit 0.1 --unsigned
+veil deposit ETH 0.1 --unsigned
 # {"to":"0x...","data":"0x...","value":"100000000000000000","chainId":8453}
 ```
 

@@ -23,6 +23,16 @@ _post() {
   curl -s "$API" -X POST -H "Content-Type: application/json" -d "$1"
 }
 
+_require_numpy() {
+  if ! python3 - <<'PY' >/dev/null 2>&1
+import numpy
+PY
+  then
+    echo "This command requires numpy. Install with: pip install numpy"
+    exit 1
+  fi
+}
+
 cmd_price() {
   local coin="${1:-BTC}"
   if [[ "$coin" == "all" ]]; then
@@ -133,20 +143,29 @@ cmd_candles() {
   local count="${3:-24}"
   coin="${coin^^}"
   
-  # Convert interval to API format
-  local api_interval="$interval"
-  
   # Calculate time range
   local now_ms=$(python3 -c "import time; print(int(time.time()*1000))")
   local interval_ms
   case "$interval" in
     1m)  interval_ms=60000 ;;
+    3m)  interval_ms=180000 ;;
     5m)  interval_ms=300000 ;;
     15m) interval_ms=900000 ;;
+    30m) interval_ms=1800000 ;;
     1h)  interval_ms=3600000 ;;
+    2h)  interval_ms=7200000 ;;
     4h)  interval_ms=14400000 ;;
+    8h)  interval_ms=28800000 ;;
+    12h) interval_ms=43200000 ;;
     1d)  interval_ms=86400000 ;;
-    *)   interval_ms=3600000 ;;
+    3d)  interval_ms=259200000 ;;
+    1w)  interval_ms=604800000 ;;
+    1M)  interval_ms=2592000000 ;; # 30 days
+    *)
+      echo "Unsupported interval: $interval"
+      echo "Supported: 1m,3m,5m,15m,30m,1h,2h,4h,8h,12h,1d,3d,1w,1M"
+      exit 1
+      ;;
   esac
   
   local start_ms=$(( now_ms - interval_ms * count ))
@@ -247,6 +266,7 @@ for name, oi_usd, oi, mark in items[:15]:
 }
 
 cmd_ta() {
+  _require_numpy
   local coin="${1:-BTC}"
   coin="${coin^^}"
   
@@ -329,6 +349,7 @@ print(f'Volume:       {vol_ratio:.2f}x avg ({\"high 🔥\" if vol_ratio > 1.5 el
 }
 
 cmd_regime() {
+  _require_numpy
   local coin="${1:-BTC}"
   coin="${coin^^}"
   
@@ -456,7 +477,7 @@ cmd_positions() {
 
 # --- Main dispatcher ---
 cmd="${1:-overview}"
-shift 2>/dev/null || true
+shift 1>/dev/null || true
 
 case "$cmd" in
   price)     cmd_price "$@" ;;

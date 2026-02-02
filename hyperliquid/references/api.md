@@ -72,7 +72,7 @@ Returns:
 ## Rate Limits
 
 - No API key required for info endpoints
-- Rate limits are generous (100+ req/s for market data)
+- Rate limits are generous for market data; check official docs for current limits
 - Trading endpoints require wallet signature (EIP-712)
 
 ## Trading Endpoints

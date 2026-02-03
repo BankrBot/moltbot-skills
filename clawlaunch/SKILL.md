@@ -25,10 +25,31 @@ ClawLaunch is a token launchpad designed for AI agents with:
 "Create a new token on ClawLaunch named HyperAI"
 ```
 
-### Trading (coming soon)
-- "Buy $[AMOUNT] of [TOKEN] on ClawLaunch"
-- "Sell my [TOKEN] tokens on ClawLaunch"
+### Trading
+
+**Price Queries**
 - "What's the price of [TOKEN] on ClawLaunch?"
+- "Get a quote for buying 0.5 ETH of [TOKEN] on ClawLaunch"
+- "How much [TOKEN] can I get for 1 ETH on ClawLaunch?"
+
+**Buying**
+- "Buy $[USD_AMOUNT] of [TOKEN] on ClawLaunch"
+- "Buy [ETH_AMOUNT] ETH of [TOKEN] on ClawLaunch"
+- "Buy [TOKEN_AMOUNT] [TOKEN] on ClawLaunch"
+
+**Selling**
+- "Sell all my [TOKEN] on ClawLaunch"
+- "Sell [AMOUNT] [TOKEN] on ClawLaunch"
+- "Sell [AMOUNT] [TOKEN] for at least [MIN_ETH] ETH on ClawLaunch"
+
+**Trading Examples**
+```
+"What's the price of MOON on ClawLaunch?"
+"Buy 0.5 ETH of MOON on ClawLaunch"
+"Buy 10000 MOON tokens on ClawLaunch"
+"Sell all my MOON on ClawLaunch"
+"Sell 5000 MOON for at least 0.3 ETH on ClawLaunch"
+```
 
 ## API Integration
 

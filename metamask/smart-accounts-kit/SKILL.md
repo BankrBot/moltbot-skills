@@ -241,6 +241,22 @@ const txHash = await walletClient.sendTransactionWithDelegation({
 - `erc7710WalletActions()` - Wallet client extension
 - `sendTransactionWithDelegation()` - Redeem with EOA
 
+## Supported ERC-7715 Permission Types
+
+### ERC-20 Token Permissions
+
+| Permission Type | Description |
+|----------------|-------------|
+| `erc20-token-periodic` | Per-period limit that resets at each period |
+| `erc20-token-streaming` | Linear streaming with amountPerSecond rate |
+
+### Native Token Permissions
+
+| Permission Type | Description |
+|----------------|-------------|
+| `native-token-periodic` | Per-period ETH limit that resets |
+| `native-token-streaming` | Linear ETH streaming with amountPerSecond rate |
+
 ## Common Delegation Scopes
 
 ### Spending Limits

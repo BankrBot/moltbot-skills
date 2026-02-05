@@ -118,27 +118,30 @@ const grantedPermissions = await walletClient.requestExecutionPermissions([
 ])
 ```
 
-#### ERC-20 Allowance Permission
+#### ERC-20 Streaming Permission
 
-Allows ERC-20 token transfers up to specified total amount.
+Ensures a linear streaming transfer limit for ERC-20 tokens. Tokens accrue linearly at the configured rate, up to the maximum allowed amount.
 
 **Parameters:**
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `type` | `"erc20-token-allowance"` | Permission type |
+| `type` | `"erc20-token-streaming"` | Permission type |
 | `tokenAddress` | `Address` | ERC-20 token contract |
-| `allowance` | `bigint` | Total allowance amount (wei format) |
+| `amountPerSecond` | `bigint` | The rate at which tokens accrue per second |
+| `initialAmount` | `bigint` | The initial amount that can be transferred at start time (default: 0) |
+| `maxAmount` | `bigint` | The maximum total amount that can be unlocked (default: no limit) |
+| `startTime` | `number` | The start timestamp in seconds (default: current time) |
 | `justification` | `string` | Human-readable description |
 
 **Example:**
 
 ```typescript
 permission: {
-  type: "erc20-token-allowance",
+  type: "erc20-token-streaming",
   data: {
     tokenAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-    allowance: parseUnits("100", 6), // 100 USDC total
-    justification: "Permission to spend up to 100 USDC",
+    amountPerSecond: parseUnits("0.0001", 6), // 0.0001 USDC per second
+    justification: "Permission to stream USDC continuously",
   },
 }
 ```
@@ -170,25 +173,28 @@ permission: {
 }
 ```
 
-#### Native Token Allowance Permission
+#### Native Token Streaming Permission
 
-Allows native token transfers up to specified total amount.
+Ensures a linear streaming transfer limit for native tokens (ETH). ETH accrues linearly at the configured rate, up to the maximum allowed amount.
 
 **Parameters:**
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `type` | `"native-token-allowance"` | Permission type |
-| `allowance` | `bigint` | Total allowance amount (wei) |
+| `type` | `"native-token-streaming"` | Permission type |
+| `amountPerSecond` | `bigint` | The rate at which ETH accrues per second |
+| `initialAmount` | `bigint` | The initial amount that can be transferred at start time (default: 0) |
+| `maxAmount` | `bigint` | The maximum total amount that can be unlocked (default: no limit) |
+| `startTime` | `number` | The start timestamp in seconds (default: current time) |
 | `justification` | `string` | Human-readable description |
 
 **Example:**
 
 ```typescript
 permission: {
-  type: "native-token-allowance",
+  type: "native-token-streaming",
   data: {
-    allowance: parseEther("0.1"), // 0.1 ETH total
-    justification: "Permission to spend up to 0.1 ETH",
+    amountPerSecond: parseEther("0.00001"), // 0.00001 ETH per second
+    justification: "Permission to stream ETH continuously",
   },
 }
 ```
@@ -549,7 +555,7 @@ const bundlerClient = createBundlerClient({
 | Permission request fails | Check user upgraded to smart account                                    |
 | Redemption fails         | Verify permissionsContext and delegationManager extracted correctly     |
 | Gas estimation fails     | Ensure paymaster configured or account has funds                        |
-| Invalid permission type  | Use supported types (erc20-token-periodic, native-token-periodic, etc.) |
+| Invalid permission type  | Use supported types (erc20-token-periodic, erc20-token-streaming, native-token-periodic, native-token-streaming) |
 | Expired permission       | Request new permission with updated expiry                              |
 | User denied permission   | Provide fallback UI for manual approval                                 |
 

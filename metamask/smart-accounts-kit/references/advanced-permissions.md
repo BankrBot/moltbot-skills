@@ -125,7 +125,7 @@ Ensures a linear streaming transfer limit for ERC-20 tokens. Tokens accrue linea
 **Parameters:**
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `type` | `"erc20-token-streaming"` | Permission type |
+| `type` | `"erc20-token-stream"` | Permission type |
 | `tokenAddress` | `Address` | ERC-20 token contract |
 | `amountPerSecond` | `bigint` | The rate at which tokens accrue per second |
 | `initialAmount` | `bigint` | The initial amount that can be transferred at start time (default: 0) |
@@ -137,7 +137,7 @@ Ensures a linear streaming transfer limit for ERC-20 tokens. Tokens accrue linea
 
 ```typescript
 permission: {
-  type: "erc20-token-streaming",
+  type: "erc20-token-stream",
   data: {
     tokenAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
     amountPerSecond: parseUnits("0.0001", 6), // 0.0001 USDC per second
@@ -180,7 +180,7 @@ Ensures a linear streaming transfer limit for native tokens (ETH). ETH accrues l
 **Parameters:**
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `type` | `"native-token-streaming"` | Permission type |
+| `type` | `"native-token-stream"` | Permission type |
 | `amountPerSecond` | `bigint` | The rate at which ETH accrues per second |
 | `initialAmount` | `bigint` | The initial amount that can be transferred at start time (default: 0) |
 | `maxAmount` | `bigint` | The maximum total amount that can be unlocked (default: no limit) |
@@ -191,7 +191,7 @@ Ensures a linear streaming transfer limit for native tokens (ETH). ETH accrues l
 
 ```typescript
 permission: {
-  type: "native-token-streaming",
+  type: "native-token-stream",
   data: {
     amountPerSecond: parseEther("0.00001"), // 0.00001 ETH per second
     justification: "Permission to stream ETH continuously",
@@ -555,7 +555,7 @@ const bundlerClient = createBundlerClient({
 | Permission request fails | Check user upgraded to smart account                                    |
 | Redemption fails         | Verify permissionsContext and delegationManager extracted correctly     |
 | Gas estimation fails     | Ensure paymaster configured or account has funds                        |
-| Invalid permission type  | Use supported types (erc20-token-periodic, erc20-token-streaming, native-token-periodic, native-token-streaming) |
+| Invalid permission type  | Use supported types (erc20-token-periodic, erc20-token-stream, native-token-periodic, native-token-stream) |
 | Expired permission       | Request new permission with updated expiry                              |
 | User denied permission   | Provide fallback UI for manual approval                                 |
 

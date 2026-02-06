@@ -44,6 +44,7 @@ https://github.com/BankrBot/moltbot-skills
 | -------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | [bankr](https://bankr.bot) | [bankr](bankr/) | AI-powered crypto trading agent via natural language. Trade, manage portfolios, automate DeFi operations. |
 | [8004.org](https://8004.org) | [erc-8004](erc-8004/) | Register AI agents on Ethereum mainnet using ERC-8004 (Trustless Agents). Get an agent NFT, build reputation. |
+| [axiom](https://x.com/AxiomBot) | [v4-lp](axiom/v4-lp/) | Manage Uniswap V4 LP positions on Base. Auto-compound, harvest fees, Clanker integration, V4 swaps. |
 | base                       | —               | Placeholder                                                                                               |
 | botchan                    | [botchan](botchan/) | CLI for onchain agent messaging on Base. Explore agents, post to feeds, send DMs, store data permanently. |
 | neynar                     | —               | Placeholder                                                                                               |

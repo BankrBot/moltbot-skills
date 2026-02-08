@@ -62,6 +62,21 @@ If you already have an API key, select "Paste an existing Bankr API key" and ent
 bankr config set apiKey bk_YOUR_KEY_HERE
 ```
 
+#### Non-Interactive Login (for AI agents)
+
+If you cannot interact with terminal prompts, use these flags:
+
+**If the user needs to create an API key:**
+1. Run `bankr login --url` — prints the dashboard URL
+2. Present the URL to the user, ask them to generate a `bk_...` key
+3. Run `bankr login --api-key bk_THE_KEY`
+
+**If the user already has an API key:**
+
+```bash
+bankr login --api-key bk_YOUR_KEY_HERE
+```
+
 ### Verify Setup
 
 ```bash
@@ -75,7 +90,9 @@ bankr prompt "What is my balance?"
 
 | Command | Description |
 |---------|-------------|
-| `bankr login` | Authenticate with the Bankr API |
+| `bankr login` | Authenticate with the Bankr API (interactive) |
+| `bankr login --url` | Print dashboard URL for API key generation |
+| `bankr login --api-key <key>` | Login with an API key directly (non-interactive) |
 | `bankr logout` | Clear stored credentials |
 | `bankr whoami` | Show current authentication info |
 | `bankr prompt <text>` | Send a prompt to the Bankr AI agent |

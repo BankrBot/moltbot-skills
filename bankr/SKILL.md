@@ -199,7 +199,7 @@ The [Bankr LLM Gateway](https://docs.bankr.bot/llm-gateway/overview) is a unifie
 - **High availability** — Automatic failover between Vertex AI and OpenRouter
 - **SDK compatible** — Works with OpenAI and Anthropic SDKs, no code changes needed
 
-**Base URL:** `https://llm.bankr.bot/v1`
+**Base URL:** `https://llm.bankr.bot`
 
 ### Available Models
 
@@ -260,7 +260,7 @@ To use a Bankr model as your default in OpenClaw, add to `openclaw.json`:
 }
 ```
 
-The gateway also supports the Anthropic Messages API format. Change the `api` field in the provider config from `"openai-completions"` to `"anthropic-messages"` for Claude-native features like extended thinking.
+The gateway supports both OpenAI and Anthropic API formats. When installed via `bankr llm setup openclaw`, Claude models are automatically configured with `api: "anthropic-messages"` per-model overrides, while all other models use the default `api: "openai-completions"`.
 
 ### Claude Code
 

@@ -1,7 +1,15 @@
 ---
 name: bankr
-description: AI-powered crypto trading agent via natural language. Use when the user wants to trade crypto (buy/sell/swap tokens), check portfolio balances, view token prices, transfer crypto, manage NFTs, use leverage, bet on Polymarket, deploy tokens, or set up automated trading strategies. Supports Base, Ethereum, Polygon, Solana, and Unichain. Comprehensive capabilities include trading, portfolio management, market research, NFT operations, prediction markets, leverage trading, DeFi operations, and automation.
-metadata: {"clawdbot":{"emoji":"📺","homepage":"https://bankr.bot","requires":{"bins":["curl","jq"]}}}
+description: AI-powered crypto trading agent via natural language. Use when the user wants to trade crypto (buy/sell/swap tokens), check portfolio balances, view token prices, transfer crypto, manage NFTs, use leverage, bet on Polymarket, deploy tokens, set up automated trading strategies, submit raw transactions, execute calldata, or send transaction JSON. Supports Base, Ethereum, Polygon, Solana, and Unichain. Comprehensive capabilities include trading, portfolio management, market research, NFT operations, prediction markets, leverage trading, DeFi operations, automation, and arbitrary transaction submission.
+metadata:
+  {
+    "clawdbot":
+      {
+        "emoji": "📺",
+        "homepage": "https://bankr.bot",
+        "requires": { "bins": ["curl", "jq"] },
+      },
+  }
 ---
 
 # Bankr
@@ -58,6 +66,7 @@ scripts/bankr.sh "What is my balance?"
 ## Core Usage
 
 ### Simple Query
+
 For straightforward requests that complete quickly:
 
 ```bash
@@ -68,6 +77,7 @@ scripts/bankr.sh "What's the price of Bitcoin?"
 The main script handles the full submit-poll-complete workflow automatically.
 
 ### Manual Job Control
+
 For advanced use or long-running operations:
 
 ```bash
@@ -84,6 +94,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 ## Capabilities Overview
 
 ### Trading Operations
+
 - **Token Swaps**: Buy/sell/swap tokens across chains
 - **Cross-Chain**: Bridge tokens between chains
 - **Limit Orders**: Execute at target prices
@@ -94,6 +105,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/token-trading.md](references/token-trading.md)
 
 ### Portfolio Management
+
 - Check balances across all chains
 - View USD valuations
 - Track holdings by token or chain
@@ -103,6 +115,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/portfolio.md](references/portfolio.md)
 
 ### Market Research
+
 - Token prices and market data
 - Technical analysis (RSI, MACD, etc.)
 - Social sentiment analysis
@@ -113,6 +126,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/market-research.md](references/market-research.md)
 
 ### Transfers
+
 - Send to addresses, ENS, or social handles
 - Multi-chain support
 - Flexible amount formats
@@ -121,6 +135,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/transfers.md](references/transfers.md)
 
 ### NFT Operations
+
 - Browse and search collections
 - View floor prices and listings
 - Purchase NFTs via OpenSea
@@ -131,6 +146,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/nft-operations.md](references/nft-operations.md)
 
 ### Polymarket Betting
+
 - Search prediction markets
 - Check odds
 - Place bets on outcomes
@@ -140,6 +156,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/polymarket.md](references/polymarket.md)
 
 ### Leverage Trading
+
 - Long/short positions (up to 50x crypto, 100x forex/commodities)
 - Crypto, forex, and commodities
 - Stop loss and take profit
@@ -148,14 +165,20 @@ scripts/bankr-cancel.sh "$JOB_ID"
 **Reference**: [references/leverage-trading.md](references/leverage-trading.md)
 
 ### Token Deployment
-- Deploy ERC20 tokens on Base and Unichain via Clanker
-- Customizable name, symbol, description, and social links
-- Creator fee claiming
-- Rate limits: 1/day standard, 10/day Bankr Club
+
+- **EVM (Base)**: Deploy ERC20 tokens via Clanker with customizable metadata and social links
+- **Solana**: Launch SPL tokens via Raydium LaunchLab with bonding curve and auto-migration to CPMM
+- Creator fee claiming on both chains
+- Fee Key NFTs for Solana (50% LP trading fees post-migration)
+- Optional fee recipient designation with 99.9%/0.1% split (Solana)
+- Both creator AND fee recipient can claim bonding curve fees (gas sponsored)
+- Optional vesting parameters (Solana)
+- Rate limits: 1/day standard, 10/day Bankr Club (gas sponsored within limits)
 
 **Reference**: [references/token-deployment.md](references/token-deployment.md)
 
 ### Automation
+
 - Limit orders
 - Stop loss orders
 - DCA (dollar-cost averaging)
@@ -163,6 +186,15 @@ scripts/bankr-cancel.sh "$JOB_ID"
 - Scheduled commands
 
 **Reference**: [references/automation.md](references/automation.md)
+
+### Arbitrary Transactions
+
+- Submit raw EVM transactions with explicit calldata
+- Custom contract calls to any address
+- Execute pre-built calldata from other tools
+- Value transfers with data
+
+**Reference**: [references/arbitrary-transaction.md](references/arbitrary-transaction.md)
 
 ## Supported Chains
 
@@ -177,6 +209,7 @@ scripts/bankr-cancel.sh "$JOB_ID"
 ## Common Patterns
 
 ### Check Before Trading
+
 ```bash
 # Check balance
 scripts/bankr.sh "What is my ETH balance on Base?"
@@ -189,6 +222,7 @@ scripts/bankr.sh "Buy $20 of PEPE on Base"
 ```
 
 ### Portfolio Review
+
 ```bash
 # Full portfolio
 scripts/bankr.sh "Show my complete portfolio"
@@ -201,6 +235,7 @@ scripts/bankr.sh "Show my ETH across all chains"
 ```
 
 ### Set Up Automation
+
 ```bash
 # DCA strategy
 scripts/bankr.sh "DCA $100 into ETH every week"
@@ -213,6 +248,7 @@ scripts/bankr.sh "Buy ETH if price drops to $3,000"
 ```
 
 ### Market Research
+
 ```bash
 # Price and analysis
 scripts/bankr.sh "Do technical analysis on ETH"
@@ -236,6 +272,20 @@ The `bankr.sh` wrapper handles this automatically. For details on the API struct
 
 **Reference**: [references/api-workflow.md](references/api-workflow.md)
 
+### Synchronous Endpoints
+
+For direct signing and transaction submission, Bankr also provides synchronous endpoints:
+
+- **POST /agent/sign** - Sign messages, typed data, or transactions without broadcasting
+- **POST /agent/submit** - Submit raw transactions directly to the blockchain
+
+These endpoints return immediately (no polling required) and are ideal for:
+- Authentication flows (sign messages)
+- Gasless approvals (sign EIP-712 permits)
+- Pre-built transactions (submit raw calldata)
+
+**Reference**: [references/sign-submit-api.md](references/sign-submit-api.md)
+
 ## Error Handling
 
 Common issues and fixes:
@@ -253,6 +303,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 ## Best Practices
 
 ### Security
+
 1. Never share your API key
 2. Start with small test amounts
 3. Verify addresses before large transfers
@@ -260,6 +311,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 5. Double-check transaction details
 
 ### Trading
+
 1. Check balance before trades
 2. Specify chain for lesser-known tokens
 3. Consider gas costs (use Base/Polygon for small amounts)
@@ -267,6 +319,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 5. Use limit orders for better prices
 
 ### Automation
+
 1. Test automation with small amounts first
 2. Review active orders regularly
 3. Set realistic price targets
@@ -276,6 +329,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 ## Tips for Success
 
 ### For New Users
+
 - Start with balance checks and price queries
 - Test with $5-10 trades first
 - Use Base for lower fees
@@ -283,6 +337,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 - Learn one feature at a time
 
 ### For Experienced Users
+
 - Leverage automation for strategies
 - Use multiple chains for diversification
 - Combine DCA with stop losses
@@ -292,47 +347,121 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 ## Prompt Examples by Category
 
 ### Trading
+
 - "Buy $50 of ETH on Base"
 - "Swap 0.1 ETH for USDC"
 - "Sell 50% of my PEPE"
 - "Bridge 100 USDC from Polygon to Base"
 
 ### Portfolio
+
 - "Show my portfolio"
 - "What's my ETH balance?"
 - "Total portfolio value"
 - "Holdings on Base"
 
 ### Market Research
+
 - "What's the price of Bitcoin?"
 - "Analyze ETH price"
 - "Trending tokens on Base"
 - "Compare UNI vs SUSHI"
 
 ### Transfers
+
 - "Send 0.1 ETH to vitalik.eth"
 - "Transfer $20 USDC to @friend"
 - "Send 50 USDC to 0x123..."
 
 ### NFTs
+
 - "Show Bored Ape floor price"
 - "Buy cheapest Pudgy Penguin"
 - "Show my NFTs"
 
 ### Polymarket
+
 - "What are the odds Trump wins?"
 - "Bet $10 on Yes for [market]"
 - "Show my Polymarket positions"
 
 ### Leverage
+
 - "Open 5x long on ETH with $100"
 - "Short BTC 10x with stop loss at $45k"
 - "Show my Avantis positions"
 
 ### Automation
+
 - "DCA $100 into ETH weekly"
 - "Set limit order to buy ETH at $3,000"
 - "Stop loss for all holdings at -20%"
+
+### Token Deployment
+
+**Solana (LaunchLab):**
+
+- "Launch a token called MOON on Solana"
+- "Launch a token called FROG and give fees to @0xDeployer"
+- "Deploy SpaceRocket with symbol ROCK"
+- "Launch BRAIN and route fees to 7xKXtg..."
+- "How much fees can I claim for MOON?"
+- "Claim my fees for MOON" (works for creator or fee recipient)
+- "Show my Fee Key NFTs"
+- "Claim my fee NFT for ROCKET" (post-migration)
+- "Transfer fees for MOON to 7xKXtg..."
+
+**EVM (Clanker):**
+
+- "Deploy a token called BankrFan with symbol BFAN on Base"
+- "Claim fees for my token MTK"
+
+### Arbitrary Transactions
+
+- "Submit this transaction: {to: 0x..., data: 0x..., value: 0, chainId: 8453}"
+- "Execute this calldata on Base: {...}"
+- "Send raw transaction with this JSON: {...}"
+
+### Sign API (Synchronous)
+
+Direct message signing without AI processing:
+
+```bash
+# Sign a plain text message
+curl -X POST "https://api.bankr.bot/agent/sign" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"signatureType": "personal_sign", "message": "Hello, Bankr!"}'
+
+# Sign EIP-712 typed data (permits, orders)
+curl -X POST "https://api.bankr.bot/agent/sign" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"signatureType": "eth_signTypedData_v4", "typedData": {...}}'
+
+# Sign a transaction without broadcasting
+curl -X POST "https://api.bankr.bot/agent/sign" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"signatureType": "eth_signTransaction", "transaction": {"to": "0x...", "chainId": 8453}}'
+```
+
+### Submit API (Synchronous)
+
+Direct transaction submission without AI processing:
+
+```bash
+# Submit a raw transaction
+curl -X POST "https://api.bankr.bot/agent/submit" \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaction": {"to": "0x...", "chainId": 8453, "value": "1000000000000000000"},
+    "waitForConfirmation": true
+  }'
+```
+
+**Reference**: [references/sign-submit-api.md](references/sign-submit-api.md)
 
 ## Resources
 
@@ -344,6 +473,7 @@ For comprehensive error troubleshooting, setup instructions, and debugging steps
 ## Troubleshooting
 
 ### Scripts Not Working
+
 ```bash
 # Ensure scripts are executable
 chmod +x ~/.clawdbot/skills/bankr/scripts/*.sh
@@ -353,9 +483,11 @@ curl -I https://api.bankr.bot
 ```
 
 ### API Errors
+
 See [references/error-handling.md](references/error-handling.md) for comprehensive troubleshooting.
 
 ### Getting Help
+
 1. Check error message in response JSON
 2. Consult relevant reference document
 3. Verify configuration and connectivity

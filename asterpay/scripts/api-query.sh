@@ -12,7 +12,7 @@ API_BASE="https://x402-api-production-ba87.up.railway.app"
 if [ -z "$ENDPOINT" ]; then
   echo "Usage: ./api-query.sh <endpoint> [symbol]"
   echo ""
-  echo "Available endpoints ($0.001 USDC per call via x402):"
+  echo "Available endpoints (\$0.001 USDC per call via x402):"
   echo ""
   echo "  market-data <symbol>      Real-time price, volume, market cap"
   echo "  sentiment <symbol>        Social sentiment analysis"
@@ -42,8 +42,10 @@ echo "Querying AsterPay: $ENDPOINT ${SYMBOL:+($SYMBOL)}"
 echo "Cost: \$0.001 USDC via x402 protocol"
 echo ""
 
-RESPONSE=$(curl -s "$URL" 2>/dev/null)
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" 2>/dev/null)
+# Single curl call to avoid double requests and race conditions
+RESPONSE=$(curl -s -w "\n%{http_code}" "$URL" 2>/dev/null)
+HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+RESPONSE=$(echo "$RESPONSE" | sed '$d')
 
 if [ "$HTTP_CODE" = "402" ]; then
   echo "Payment Required (HTTP 402)"

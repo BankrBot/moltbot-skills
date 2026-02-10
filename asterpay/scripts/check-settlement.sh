@@ -17,13 +17,20 @@ echo "Checking settlement status..."
 echo "Transaction: $TXID"
 echo ""
 
-RESPONSE=$(curl -s "$API_BASE/settlement/status/$TXID" 2>/dev/null)
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$API_BASE/settlement/status/$TXID" 2>/dev/null)
+# Single curl call to avoid double requests
+RESULT=$(curl -s -w "\n%{http_code}" "$API_BASE/settlement/status/$TXID" 2>/dev/null)
+HTTP_CODE=$(echo "$RESULT" | tail -1)
+RESPONSE=$(echo "$RESULT" | sed '$d')
 
 if [ "$HTTP_CODE" = "200" ]; then
   echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
+elif [ "$HTTP_CODE" = "404" ]; then
+  echo "Transaction not found. It may still be processing."
+  echo ""
+  echo "SEPA Instant typically settles in <10 seconds."
+  echo "If more than 30 minutes have passed, contact support@asterpay.io"
 else
-  echo "Status: Checking..."
+  echo "Unable to check status (HTTP $HTTP_CODE)."
   echo ""
   echo "SEPA Instant typically settles in <10 seconds."
   echo "If more than 30 minutes have passed, contact support@asterpay.io"

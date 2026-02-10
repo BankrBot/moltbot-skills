@@ -2,6 +2,10 @@
 # Convert USDC to EUR and send via SEPA Instant
 # Usage: ./offramp.sh <amount_usdc> <iban>
 # Example: ./offramp.sh 100 DE89370400440532013000
+#
+# NOTE: This script validates input and generates the Bankr prompt
+# to execute the off-ramp. The actual on-chain transaction is
+# submitted via Bankr's agent API.
 
 set -e
 
@@ -17,7 +21,7 @@ if [ -z "$AMOUNT" ] || [ -z "$IBAN" ]; then
   echo ""
   echo "Example:"
   echo "  ./offramp.sh 100 DE89370400440532013000"
-  echo "  → Converts 100 USDC to EUR and sends to German bank account"
+  echo "  -> Converts 100 USDC to EUR and sends to German bank account"
   exit 1
 fi
 
@@ -37,9 +41,9 @@ if [[ ! " $SEPA_COUNTRIES " =~ " $COUNTRY " ]]; then
   exit 1
 fi
 
-echo "═══════════════════════════════════════════"
+echo "======================================="
 echo "  AsterPay EUR Settlement"
-echo "═══════════════════════════════════════════"
+echo "======================================="
 echo ""
 echo "  Amount:      $AMOUNT USDC"
 echo "  Recipient:   $IBAN"
@@ -48,16 +52,24 @@ echo "  Rail:        SEPA Instant"
 echo "  Est. time:   <10 seconds"
 echo ""
 
-# Use Bankr to initiate the off-ramp via AsterPay's x402 API
-echo "Initiating USDC → EUR conversion via AsterPay..."
-echo ""
-
-# The actual settlement is handled by AsterPay's x402-enabled API
-# Bankr agents submit via arbitrary transaction to AsterPay's settlement contract
-API_BASE="https://x402-api-production-ba87.up.railway.app"
-
-echo "Settlement request submitted to AsterPay"
-echo "Monitor status at: $API_BASE/settlement/status"
-echo ""
-echo "Note: Actual settlement requires x402 payment authorization."
-echo "Use 'bankr prompt' to execute the on-chain transaction."
+# Check if bankr CLI is available
+if command -v bankr &> /dev/null; then
+  echo "Submitting off-ramp via Bankr..."
+  bankr prompt "Send $AMOUNT USDC to AsterPay EUR off-ramp for IBAN $IBAN. Use AsterPay's x402 settlement API at https://x402-api-production-ba87.up.railway.app to convert USDC to EUR via SEPA Instant."
+else
+  echo "Bankr CLI not found. To execute this off-ramp:"
+  echo ""
+  echo "Option 1 - Install Bankr CLI:"
+  echo "  npm install -g @bankr/cli"
+  echo "  bankr login"
+  echo "  bankr prompt \"Send $AMOUNT USDC to AsterPay EUR off-ramp for IBAN $IBAN\""
+  echo ""
+  echo "Option 2 - Use Bankr REST API:"
+  echo "  curl -X POST https://api.bankr.bot/agent/prompt \\"
+  echo "    -H \"X-API-Key: \$BANKR_API_KEY\" \\"
+  echo "    -H \"Content-Type: application/json\" \\"
+  echo "    -d '{\"prompt\": \"Send $AMOUNT USDC to AsterPay EUR off-ramp for IBAN $IBAN\"}'"
+  echo ""
+  echo "Option 3 - Use AsterPay MCP Server (for Claude/Cursor):"
+  echo '  {"mcpServers": {"asterpay": {"command": "npx", "args": ["@asterpay/mcp-server"]}}}'
+fi

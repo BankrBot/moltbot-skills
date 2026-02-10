@@ -16,7 +16,7 @@ if [ -z "$AMOUNT" ] || [ -z "$IBAN" ]; then
   echo "Usage: ./offramp.sh <amount_usdc> <iban>"
   echo ""
   echo "Parameters:"
-  echo "  amount_usdc  Amount of USDC to convert to EUR (numeric, 1-100000)"
+  echo "  amount_usdc  Amount of USDC to convert to EUR (numeric, 1-110000)"
   echo "  iban         Recipient's European bank IBAN"
   echo ""
   echo "Example:"
@@ -31,16 +31,19 @@ if ! echo "$AMOUNT" | grep -qE '^[0-9]+(\.[0-9]{1,2})?$'; then
   exit 1
 fi
 
-# Validate amount range (1 USDC minimum, 100000 EUR SEPA Instant limit)
-if command -v bc &> /dev/null; then
-  if [ "$(echo "$AMOUNT < 1" | bc -l)" = "1" ]; then
-    echo "Error: Minimum amount is 1 USDC"
-    exit 1
-  fi
-  if [ "$(echo "$AMOUNT > 100000" | bc -l)" = "1" ]; then
-    echo "Error: Maximum amount is 100,000 USDC (SEPA Instant limit)"
-    exit 1
-  fi
+# Validate amount range using pure bash integer comparison as primary method
+# Strip decimal part for range check (conservative: 99.50 -> 99)
+AMOUNT_INT=$(echo "$AMOUNT" | grep -oE '^[0-9]+')
+
+if [ "$AMOUNT_INT" -lt 1 ] 2>/dev/null; then
+  echo "Error: Minimum amount is 1 USDC"
+  exit 1
+fi
+
+# SEPA Instant limit is EUR 100,000. At ~1.05-1.10 USD/EUR, that's ~110,000 USDC max.
+if [ "$AMOUNT_INT" -gt 110000 ] 2>/dev/null; then
+  echo "Error: Maximum amount is ~110,000 USDC (SEPA Instant limit of EUR 100,000)"
+  exit 1
 fi
 
 # Validate IBAN format (basic check)

@@ -25,11 +25,13 @@ export function sanitizeReply(text: string): string {
 
   if (BOT_COMMAND_RE.test(text)) {
     BOT_COMMAND_RE.lastIndex = 0; // reset stateful regex
-    const cleaned = text.replace(BOT_COMMAND_RE, "[blocked command]");
-    if (cleaned.trim().length < 10) {
+    BOT_COMMAND_RE.lastIndex = 0;
+    const stripped = text.replace(BOT_COMMAND_RE, "");
+    if (stripped.trim().length < 10) {
       return "Nice try. That's a prompt injection attempt.";
     }
-    return cleaned;
+    BOT_COMMAND_RE.lastIndex = 0;
+    return text.replace(BOT_COMMAND_RE, "[blocked command]");
   }
 
   return text;

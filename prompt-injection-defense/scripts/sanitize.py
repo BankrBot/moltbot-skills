@@ -35,9 +35,10 @@ def sanitize_reply(text: str) -> str:
         return text
 
     if BOT_COMMAND_RE.search(text):
-        cleaned = BOT_COMMAND_RE.sub("[blocked command]", text)
+        cleaned = BOT_COMMAND_RE.sub("", text)
         if len(cleaned.strip()) < 10:
             return "Nice try. That's a prompt injection attempt."
+        cleaned = BOT_COMMAND_RE.sub("[blocked command]", text)
         return cleaned
 
     return text

@@ -79,10 +79,10 @@ def sanitize_reply(text: str) -> str:
         return text
 
     if BOT_COMMAND_RE.search(text):
-        cleaned = BOT_COMMAND_RE.sub("[blocked command]", text)
+        cleaned = BOT_COMMAND_RE.sub("", text)
         if len(cleaned.strip()) < 10:
             return "Nice try. That's a prompt injection attempt."
-        return cleaned
+        return BOT_COMMAND_RE.sub("[blocked command]", text)
 
     return text
 ```
@@ -97,11 +97,12 @@ function sanitizeReply(text: string): string {
 
   if (BOT_COMMAND_RE.test(text)) {
     BOT_COMMAND_RE.lastIndex = 0; // reset regex state
-    const cleaned = text.replace(BOT_COMMAND_RE, "[blocked command]");
-    if (cleaned.trim().length < 10) {
+    const stripped = text.replace(BOT_COMMAND_RE, "");
+    if (stripped.trim().length < 10) {
       return "Nice try. That's a prompt injection attempt.";
     }
-    return cleaned;
+    BOT_COMMAND_RE.lastIndex = 0;
+    return text.replace(BOT_COMMAND_RE, "[blocked command]");
   }
 
   return text;
@@ -158,10 +159,10 @@ def sanitize_reply(text: str) -> str:
         return text
     if BOT_COMMAND_RE.search(text):
         logger.warning(f"Prompt injection blocked: {text[:200]}")
-        cleaned = BOT_COMMAND_RE.sub("[blocked command]", text)
+        cleaned = BOT_COMMAND_RE.sub("", text)
         if len(cleaned.strip()) < 10:
             return "Nice try. That's a prompt injection attempt."
-        return cleaned
+        return BOT_COMMAND_RE.sub("[blocked command]", text)
     return text
 ```
 

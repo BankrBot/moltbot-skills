@@ -166,16 +166,11 @@ bankr llm setup opencode
 ### Cursor
 
 ```bash
-# Get step-by-step setup instructions
+# Get step-by-step setup instructions with your API key
 bankr llm setup cursor
 ```
 
-This prints guided instructions for:
-1. Enter your API key under **OpenAI API Key**
-2. Enable **Override OpenAI Base URL** and set `https://llm.bankr.bot/v1`
-3. Add model IDs (`claude-sonnet-4.5`, `gemini-3-flash`, etc.)
-
-**Note:** When Override Base URL is enabled, ALL model requests go through the gateway. Disable other models you don't need to avoid validation errors.
+The setup adds your key as the OpenAI API Key, sets `https://llm.bankr.bot/v1` as the base URL override, and registers the available model IDs. When the base URL override is enabled, all model requests go through the gateway.
 
 ## Direct SDK Usage
 
@@ -282,5 +277,3 @@ message = client.messages.create(
 ---
 
 **Documentation**: https://docs.bankr.bot/llm-gateway/overview
-**Credit Balance**: `bankr llm credits`
-**Model List**: `bankr llm models`

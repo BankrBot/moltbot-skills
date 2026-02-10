@@ -4,36 +4,23 @@ Understanding the asynchronous job pattern for Bankr API operations.
 
 **Source**: [Agent API Reference](https://www.notion.so/Agent-API-2e18e0f9661f80cb83ccfc046f8872e3)
 
-## Option 1: Bankr CLI (Recommended)
+## Using the Bankr CLI
 
-The Bankr CLI handles the full submit-poll-complete workflow automatically:
+The CLI handles submit-poll-complete automatically. For installation and login, see the main [SKILL.md](../SKILL.md).
 
 ```bash
-# Install
-bun install -g @bankr/cli
-
-# Authenticate
-bankr login
-
-# Submit a prompt (handles polling and completion automatically)
-bankr prompt "What is my ETH balance?"
-
-# Check status of a specific job
-bankr status <jobId>
-
-# Cancel a running job
-bankr cancel <jobId>
+bankr prompt "What is my ETH balance?"   # submit + poll + display
+bankr status <jobId>                      # check a specific job
+bankr cancel <jobId>                      # cancel a running job
 ```
 
-The CLI manages authentication, job polling, status updates, and error handling out of the box.
+## Using the REST API Directly
 
-## Option 2: REST API (Direct)
+Call the endpoints below with `curl`, `fetch`, or any HTTP client. All requests require an `X-API-Key` header.
 
-Call the endpoints below directly using `curl`, `fetch`, or any HTTP client. All requests require an `X-API-Key` header with your Bankr API key.
+### Core Pattern: Submit-Poll-Complete
 
-## Core Pattern: Submit-Poll-Complete
-
-All Bankr operations follow this pattern:
+All operations follow this pattern:
 
 ```
 1. SUBMIT  → Send prompt, get job ID

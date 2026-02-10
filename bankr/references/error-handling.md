@@ -190,24 +190,14 @@ bankr config set llmKey your_llm_key_here
 bankr whoami
 ```
 
-### Config File Location
-The CLI stores config at `~/.bankr/config.json`. You can view or update it:
-```bash
-bankr config get
-bankr config set apiKey bk_new_key_here
-bankr config set llmKey your_llm_key_here
-```
+Config is stored at `~/.bankr/config.json`. View current values with `bankr config get`.
 
 ### REST API Authentication
-If using the API directly without the CLI:
+If using the API directly without the CLI, test your key with:
 ```bash
-# Test your API key
 curl -s "https://api.bankr.bot/_health" -H "X-API-Key: $BANKR_API_KEY"
-
-# Use env vars
-export BANKR_API_KEY=bk_your_key_here
-export BANKR_LLM_KEY=your_llm_key_here  # optional, for LLM gateway
 ```
+Set `BANKR_API_KEY` (and optionally `BANKR_LLM_KEY` for the LLM gateway) as environment variables.
 
 ## User-Friendly Error Messages
 

@@ -1,6 +1,6 @@
 ---
 name: bankr
-description: AI-powered crypto trading agent via natural language. Use when the user wants to trade crypto (buy/sell/swap tokens), check portfolio balances, view token prices, transfer crypto, manage NFTs, use leverage, bet on Polymarket, deploy tokens, set up automated trading strategies, submit raw transactions, execute calldata, or send transaction JSON. Supports Base, Ethereum, Polygon, Solana, and Unichain. Comprehensive capabilities include trading, portfolio management, market research, NFT operations, prediction markets, leverage trading, DeFi operations, automation, and arbitrary transaction submission.
+description: AI-powered crypto trading agent and LLM gateway via natural language. Use when the user wants to trade crypto, check portfolio balances, view token prices, transfer crypto, manage NFTs, use leverage, bet on Polymarket, deploy tokens, set up automated trading, sign and submit raw transactions, or access LLM models through the Bankr LLM gateway funded by your Bankr wallet. Supports Base, Ethereum, Polygon, Solana, and Unichain.
 metadata:
   {
     "clawdbot":
@@ -63,19 +63,7 @@ The `bankr login` command gives you two choices:
 
 #### Separate LLM Gateway Key (Optional)
 
-If your LLM gateway key differs from your Bankr API key, you can set them separately. During interactive login the CLI will ask if you want a different LLM key. You can also pass it directly:
-
-```bash
-bankr login --api-key bk_YOUR_KEY --llm-key YOUR_LLM_KEY
-```
-
-Or set it via config:
-
-```bash
-bankr config set llmKey YOUR_LLM_KEY
-```
-
-When not set, the API key is used for both the agent API and the LLM gateway.
+If your LLM gateway key differs from your API key, pass `--llm-key` during login or run `bankr config set llmKey YOUR_LLM_KEY` afterward. When not set, the API key is used for both. See [references/llm-gateway.md](references/llm-gateway.md) for full details.
 
 #### Non-Interactive Login (for AI agents)
 
@@ -139,30 +127,24 @@ echo "$RESULT" | jq -r '.response'
 
 ### Conversation Threads
 
-Every prompt response (and completed job) includes a `threadId`. Save it and pass it back to continue the conversation — the agent remembers context from earlier messages in the same thread.
+Every prompt response includes a `threadId`. Pass it back to continue the conversation:
 
 ```bash
-# Start a conversation — save the threadId from the response
+# Start — the response includes a threadId
 curl -X POST "https://api.bankr.bot/agent/prompt" \
   -H "X-API-Key: $BANKR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"prompt": "What is the price of ETH?"}'
 # → {"jobId": "job_abc", "threadId": "thr_XYZ", ...}
 
-# Continue it — pass threadId to maintain context
+# Continue — pass threadId to maintain context
 curl -X POST "https://api.bankr.bot/agent/prompt" \
   -H "X-API-Key: $BANKR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"prompt": "And what about SOL?", "threadId": "thr_XYZ"}'
-
-# Continue further — same threadId
-curl -X POST "https://api.bankr.bot/agent/prompt" \
-  -H "X-API-Key: $BANKR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Compare them", "threadId": "thr_XYZ"}'
 ```
 
-Omit `threadId` to start a new conversation. The CLI equivalent is `bankr prompt --continue` (reuses last thread) or `bankr prompt --thread <id>`.
+Omit `threadId` to start a new conversation. CLI equivalent: `bankr prompt --continue` (reuses last thread) or `bankr prompt --thread <id>`.
 
 ### API Endpoints Summary
 
@@ -315,27 +297,6 @@ bankr llm setup claude                     # Print Claude Code env vars
 bankr llm setup cursor                     # Cursor setup instructions
 bankr llm claude                           # Launch Claude Code through gateway
 bankr llm claude --model claude-opus-4.6   # Launch with specific model
-```
-
-### OpenClaw Provider Setup
-
-```bash
-# Auto-install — writes provider config to ~/.openclaw/openclaw.json
-bankr llm setup openclaw --install
-```
-
-To use a Bankr model as your default, add to `openclaw.json`:
-
-```json
-{
-  "agents": {
-    "defaults": {
-      "model": {
-        "primary": "bankr/claude-sonnet-4.5"
-      }
-    }
-  }
-}
 ```
 
 ### Direct SDK Usage

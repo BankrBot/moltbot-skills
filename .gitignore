@@ -30,3 +30,17 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+# Agentic Mode
+.antigravity/
+
+# Documentation (local only)
+docs/
+
+# Node modules (global exclusion)
+node_modules/
+package-lock.json
+
+# Logs
+npm-debug.log
+

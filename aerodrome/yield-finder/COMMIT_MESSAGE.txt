@@ -1,0 +1,9 @@
+Add Aerodrome Yield Finder skill for Base
+
+Queries Aerodrome Sugar contract for real-time pool data
+Filters by TVL, sorts by APR/yield
+Supports AERO, ETH, BTC, and stablecoin pricing
+Includes comprehensive test suite
+All tests passing
+
+Usage: ./scripts/query-pools.sh --min-tvl 10000 --limit 10

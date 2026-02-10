@@ -3,8 +3,6 @@
 # Usage: ./api-query.sh <endpoint> <symbol>
 # Example: ./api-query.sh market-data BTC
 
-set -e
-
 ENDPOINT=$1
 SYMBOL=$2
 API_BASE="https://x402-api-production-ba87.up.railway.app"

@@ -7,6 +7,19 @@ ENDPOINT=$1
 SYMBOL=$2
 API_BASE="https://x402-api-production-ba87.up.railway.app"
 
+# Validate ENDPOINT: alphanumeric and hyphens only (prevents path traversal and URL injection)
+if [ -n "$ENDPOINT" ] && ! echo "$ENDPOINT" | grep -qE '^[a-zA-Z0-9-]{1,64}$'; then
+  echo "Error: Invalid endpoint name. Use alphanumeric characters and hyphens only."
+  echo "Run './api-query.sh' without arguments to see available endpoints."
+  exit 1
+fi
+
+# Validate SYMBOL: alphanumeric, hyphens, underscores only (prevents query injection)
+if [ -n "$SYMBOL" ] && ! echo "$SYMBOL" | grep -qE '^[a-zA-Z0-9_-]{1,32}$'; then
+  echo "Error: Invalid symbol/protocol name. Use alphanumeric characters, hyphens, and underscores only."
+  exit 1
+fi
+
 if [ -z "$ENDPOINT" ]; then
   echo "Usage: ./api-query.sh <endpoint> [symbol]"
   echo ""

@@ -43,11 +43,11 @@ for GOTCHI_ID in $GOTCHI_IDS; do
   while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     # Separate stdout and stderr properly
     set +e
-    DATA=$(cast call "$CONTRACT" "getAavegotchi(uint256)" "$GOTCHI_ID" --rpc-url "$RPC_URL" 2>/tmp/cast_error_$$)
+    TEMP_ERR=$(mktemp) && DATA=$(cast call "$CONTRACT" "getAavegotchi(uint256)" "$GOTCHI_ID" --rpc-url "$RPC_URL" 2>"$TEMP_ERR")
     CAST_EXIT=$?
     set -e
     
-    CAST_ERROR=$(cat /tmp/cast_error_$$ 2>/dev/null || echo "")
+    CAST_ERROR=$(cat "$TEMP_ERR" 2>/dev/null || echo "")
     rm -f /tmp/cast_error_$$
 
     if [ $CAST_EXIT -eq 0 ] && [ -n "$DATA" ] && [ -z "$CAST_ERROR" ]; then

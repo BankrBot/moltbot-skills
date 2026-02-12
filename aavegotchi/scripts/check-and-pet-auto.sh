@@ -50,7 +50,7 @@ for GOTCHI_ID in $GOTCHI_IDS; do
     CAST_ERROR=$(cat "$TEMP_ERR" 2>/dev/null || echo "")
     rm -f "$TEMP_ERR"
 
-    if [ $CAST_EXIT -eq 0 ] && [ -n "$DATA" ] && [ -z "$CAST_ERROR" ]; then
+    if [ $CAST_EXIT -eq 0 ] && [ -n "$DATA" ]; then
       SUCCESS=true
       break  # Success
     fi

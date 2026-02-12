@@ -3,7 +3,7 @@
 This is a draft skill folder intended for submission to:
 https://github.com/BankrBot/openclaw-skills
 
-It wraps the local `veildotcash-sdk` checkout and optionally uses Bankr Agent API to sign & submit the unsigned deposit/register transactions.
+It wraps the `@veil-cash/sdk` (v3) CLI and optionally uses Bankr Agent API to sign & submit unsigned deposit/register transactions. Supports **ETH, USDC, and cbBTC** privacy pools.
 
 ## Assumptions
 
@@ -45,19 +45,33 @@ scripts/veil-keypair.sh
 # Ask Bankr for address
 scripts/veil-bankr-prompt.sh "What is my Base wallet address? Respond with just the address."
 
-# Check balances
+# Check balances (ETH pool — default)
 scripts/veil-balance.sh --address 0x...
 
-# Deposit via Bankr (build unsigned tx + submit)
-scripts/veil-deposit-via-bankr.sh 0.011 --address 0x...
+# Check balances (USDC or cbBTC pool)
+scripts/veil-balance.sh --address 0x... --pool usdc
+scripts/veil-balance.sh --address 0x... --pool cbbtc
+
+# Deposit via Bankr — ETH (build unsigned tx + submit)
+scripts/veil-deposit-via-bankr.sh ETH 0.011 --address 0x...
+
+# Deposit via Bankr — USDC (auto-handles approve + deposit)
+scripts/veil-deposit-via-bankr.sh USDC 100 --address 0x...
+
+# Deposit via Bankr — cbBTC
+scripts/veil-deposit-via-bankr.sh CBBTC 0.001 --address 0x...
 
 # Withdraw / transfer / merge (local VEIL_KEY required)
-scripts/veil-withdraw.sh 0.007 0x...
-scripts/veil-transfer.sh 0.001 0x...
-scripts/veil-merge.sh 0.001
+scripts/veil-withdraw.sh ETH 0.007 0x...
+scripts/veil-withdraw.sh USDC 50 0x...
+scripts/veil-transfer.sh ETH 0.001 0x...
+scripts/veil-transfer.sh USDC 25 0x...
+scripts/veil-merge.sh ETH 0.001
+scripts/veil-merge.sh USDC 100
 ```
 
 ## Notes
 
 - `veil-bankr-prompt.sh` implements the same submit/poll loop as the Bankr skill, but localized here so this skill is self-contained.
-- For production polish, the Veil SDK should ideally add `--env-file` flags so the CLI isn’t sensitive to the current working directory.
+- For USDC and cbBTC deposits via Bankr, `veil-deposit-via-bankr.sh` automatically submits the ERC20 approval transaction first, then the deposit transaction.
+- All action scripts take asset as the first argument: `ETH`, `USDC`, or `CBBTC`.

@@ -44,6 +44,7 @@ scripts/veil-init.sh
 
 ```bash
 scripts/veil-balance.sh --address 0xYOUR_ADDRESS
+scripts/veil-balance.sh --address 0xYOUR_ADDRESS --pool usdc
 ```
 
 Look at the `queue` vs `private` balances in the output.
@@ -56,6 +57,32 @@ Look at the `queue` vs `private` balances in the output.
 
 ```bash
 scripts/veil-balance.sh --address 0xYOUR_ADDRESS
+scripts/veil-balance.sh --address 0xYOUR_ADDRESS --pool usdc
+scripts/veil-balance.sh --address 0xYOUR_ADDRESS --pool cbbtc
+```
+
+### ERC20 Approval Failures (USDC/cbBTC)
+
+**Symptom**: USDC or cbBTC deposit fails at the approval step.
+
+**Cause**: The wallet may not have enough USDC/cbBTC balance, or there may be an existing allowance conflict.
+
+**Solution**:
+1. Verify you have sufficient token balance in your Bankr wallet.
+2. If depositing via Bankr, the `veil-deposit-via-bankr.sh` script automatically sends the approval transaction first. Ensure the first (approve) transaction completes before the second (deposit) is submitted.
+3. If using `--unsigned` directly, note that USDC/cbBTC returns a JSON array of two transactions — submit the `step: "approve"` tx first, wait for confirmation, then submit the `step: "deposit"` tx.
+
+### Wrong Pool / Asset Mismatch
+
+**Symptom**: Balance shows zero but you know you deposited.
+
+**Cause**: You may be checking the wrong pool. ETH deposits go to the ETH pool, USDC to the USDC pool, etc.
+
+**Solution**: Specify the correct pool:
+
+```bash
+scripts/veil-balance.sh --address 0xYOUR_ADDRESS --pool usdc
+scripts/veil-balance.sh --address 0xYOUR_ADDRESS --pool cbbtc
 ```
 
 ### Bankr API Errors
@@ -82,9 +109,11 @@ chmod +x scripts/*.sh
 ## Debugging Tips
 
 1. **Check balances first** — Most issues stem from funds being in queue vs private pool
-2. **Use `--quiet` flag** — Suppresses progress output for cleaner JSON parsing
-3. **Check Bankr job status** — If a deposit via Bankr hangs, the job ID is printed for manual status checks
-4. **Verify RPC connectivity** — `curl -s YOUR_RPC_URL -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`
+2. **Check the right pool** — Use `--pool usdc` or `--pool cbbtc` to check non-ETH balances
+3. **Use `--quiet` flag** — Suppresses progress output for cleaner JSON parsing
+4. **Check Bankr job status** — If a deposit via Bankr hangs, the job ID is printed for manual status checks
+5. **Verify RPC connectivity** — `curl -s YOUR_RPC_URL -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`
+6. **ERC20 deposits need two txs** — For USDC/cbBTC, ensure the approval tx confirms before the deposit tx is submitted
 
 ## Getting Help
 

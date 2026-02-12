@@ -1,4 +1,9 @@
-# Aavegotchi Petting Skill
+---
+name: aavegotchi-autopet
+description: Pet your Aavegotchi NFTs to maintain kinship on Base chain. Automated petting with 12-hour cooldown tracking.
+---
+
+# Aavegotchi Autopet
 
 Pet your Aavegotchi NFTs to maintain kinship on Base chain.
 
@@ -8,7 +13,7 @@ Ask the agent to "pet my aavegotchi" or "pet gotchi 9638"
 
 ## Configuration
 
-Create `~/.openclaw/skills/aavegotchi/config.json`:
+Create config file at `~/.openclaw/workspace/skills/aavegotchi/config.json`:
 
 ```json
 {

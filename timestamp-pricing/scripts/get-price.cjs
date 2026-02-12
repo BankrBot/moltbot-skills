@@ -11,6 +11,16 @@ const TOKEN_MAP = {
 
 function parseTimestamp(input) {
   if (!isNaN(input)) return new Date(parseInt(input) * 1000);
+
+  // Try to parse DD-MM-YYYY format
+  const ddmmyyyyMatch = input.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (ddmmyyyyMatch) {
+    const [, day, month, year] = ddmmyyyyMatch;
+    const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
+    if (!isNaN(date.getTime())) return date;
+  }
+
+  // Fallback to Date constructor for other formats
   const date = new Date(input);
   if (isNaN(date.getTime())) throw new Error('Invalid timestamp: ' + input);
   return date;

@@ -7,8 +7,14 @@ TIMESTAMP="${2:-$(date +%s)}"
 
 # Convert timestamp to Unix epoch if needed
 if [[ "$TIMESTAMP" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
-  # ISO date format
-  EPOCH=$(date -d "$TIMESTAMP" +%s 2>/dev/null || date -j -f "%Y-%m-%d %H:%M:%S" "$TIMESTAMP" +%s 2>/dev/null)
+  # ISO date format - handle both short dates and full datetime
+  if [[ "$TIMESTAMP" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    # Short date format (YYYY-MM-DD)
+    EPOCH=$(date -d "$TIMESTAMP" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$TIMESTAMP" +%s 2>/dev/null)
+  else
+    # Full datetime format
+    EPOCH=$(date -d "$TIMESTAMP" +%s 2>/dev/null || date -j -f "%Y-%m-%d %H:%M:%S" "$TIMESTAMP" +%s 2>/dev/null)
+  fi
 elif [[ "$TIMESTAMP" =~ ^[0-9]{10}$ ]]; then
   # Already Unix timestamp
   EPOCH=$TIMESTAMP
@@ -43,7 +49,7 @@ if [ $AGE -lt 86400 ]; then
     echo "Error: Bankr script not found at $BANKR_SCRIPT"
     echo "Falling back to CoinGecko historical data..."
     echo ""
-    bash "$(dirname "$0")/price-lookup.sh" "$TOKEN" "$(date -d "@$EPOCH" +%d-%m-%Y)"
+    bash "$(dirname "$0")/price-lookup.sh" "$TOKEN" "$(date -d "@$EPOCH" +%d-%m-%Y 2>/dev/null || date -r "$EPOCH" +%d-%m-%Y)"
   fi
   
 else

@@ -15,8 +15,8 @@ WAITING_COUNT=0
 ERROR_COUNT=0
 
 for GOTCHI_ID in $GOTCHI_IDS; do
-  # Check cooldown status
-  STATUS=$("$CHECK_SCRIPT" "$GOTCHI_ID" 2>/dev/null || echo "error:0:0")
+  # Check cooldown status (check-cooldown.sh already outputs error:0:0 on failure)
+  STATUS=$("$CHECK_SCRIPT" "$GOTCHI_ID" 2>/dev/null || true)
   
   STATE=$(echo "$STATUS" | cut -d: -f1)
   TIME_LEFT=$(echo "$STATUS" | cut -d: -f2)

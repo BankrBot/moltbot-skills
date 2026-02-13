@@ -12,6 +12,7 @@ echo ""
 
 READY_COUNT=0
 WAITING_COUNT=0
+ERROR_COUNT=0
 
 for GOTCHI_ID in $GOTCHI_IDS; do
   # Check cooldown status
@@ -25,6 +26,7 @@ for GOTCHI_ID in $GOTCHI_IDS; do
     echo "  #${GOTCHI_ID}"
     echo "  ❌ Error checking status"
     echo ""
+    ERROR_COUNT=$((ERROR_COUNT + 1))
     continue
   fi
   
@@ -63,4 +65,8 @@ for GOTCHI_ID in $GOTCHI_IDS; do
   echo ""
 done
 
-echo "Summary: ${READY_COUNT} ready, ${WAITING_COUNT} waiting"
+if [ "$ERROR_COUNT" -gt 0 ]; then
+  echo "Summary: ${READY_COUNT} ready, ${WAITING_COUNT} waiting, ${ERROR_COUNT} error"
+else
+  echo "Summary: ${READY_COUNT} ready, ${WAITING_COUNT} waiting"
+fi

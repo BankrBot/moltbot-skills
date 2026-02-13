@@ -48,6 +48,24 @@ def format_reply(text):
     return text
 ```
 
+### Layer 1.5: Minimize @Mentions in AI Responses
+
+**Even without auto-injection, AI responses should be conservative with @mentions.**
+
+If your bot uses an LLM (Claude, GPT, etc.), add this to your system prompt:
+
+```
+X ANTI-MUZZLE POLICY:
+- Minimize @mentions in replies. Only tag when ABSOLUTELY necessary
+- NEVER tag project accounts unless user specifically requests it
+- Use plain text names instead (e.g. "Virtuals Protocol" not "@virtuals_io")
+- Exception: Tagging creators/builders when directly relevant is OK
+- When in doubt, DON'T tag - use plain text
+```
+
+**Why this matters:**
+Even "natural" @mentions can trigger spam detection if they're frequent. Be conservative.
+
 ### Layer 2: Randomize Timing
 
 **Add human-like delays to break predictable patterns.**

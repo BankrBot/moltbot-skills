@@ -130,6 +130,79 @@ export class AntiMuzzle {
 }
 
 /**
+ * Rate-limit @mentions in outgoing reply text to avoid muzzling.
+ *
+ * Each @handle can only be mentioned once per cooldown period. When on
+ * cooldown, the @handle is replaced with the account's display name
+ * (or username without the @ if display name is unknown).
+ *
+ * Battle-tested on @solvrbot — this is the #1 defense against muzzling.
+ */
+export class MentionRateLimiter {
+  private cooldownMs: number;
+  private botHandle: string;
+  private cooldowns: Map<string, number>; // handle_lower -> last_mentioned timestamp
+  private displayNames: Map<string, string>; // handle_lower -> display name
+
+  constructor(config: { cooldownSeconds?: number; botHandle?: string } = {}) {
+    this.cooldownMs = (config.cooldownSeconds ?? 3600) * 1000;
+    this.botHandle = (config.botHandle ?? "@mybot").toLowerCase();
+    this.cooldowns = new Map();
+    this.displayNames = new Map();
+  }
+
+  /**
+   * Cache a display name for a handle (populate from X API responses)
+   */
+  cacheDisplayName(username: string, displayName: string): void {
+    this.displayNames.set(`@${username.toLowerCase()}`, displayName);
+  }
+
+  /**
+   * Bulk-cache display names from X API user includes
+   */
+  cacheFromApiUsers(users: Array<{ username: string; name?: string }>): void {
+    for (const user of users) {
+      if (user.username) {
+        this.displayNames.set(
+          `@${user.username.toLowerCase()}`,
+          user.name ?? user.username
+        );
+      }
+    }
+  }
+
+  /**
+   * Rate-limit @mentions in outgoing text.
+   * Returns text with cooldown-limited @mentions replaced by display names.
+   */
+  process(text: string): string {
+    if (!text) return text;
+
+    const now = Date.now();
+
+    return text.replace(/@([A-Za-z0-9_]{1,15})\b/g, (handle) => {
+      const handleLower = handle.toLowerCase();
+
+      // Never tag ourselves
+      if (handleLower === this.botHandle) {
+        return this.displayNames.get(handleLower) ?? handle.slice(1);
+      }
+
+      const lastUsed = this.cooldowns.get(handleLower) ?? 0;
+      if (now - lastUsed < this.cooldownMs) {
+        // On cooldown — use display name or username without @
+        return this.displayNames.get(handleLower) ?? handle.slice(1);
+      } else {
+        // Allow mention, start cooldown
+        this.cooldowns.set(handleLower, now);
+        return handle;
+      }
+    });
+  }
+}
+
+/**
  * Utilities for varying response content to avoid repetitive patterns
  */
 export class ContentVariation {
@@ -263,5 +336,25 @@ if (require.main === module) {
 
     const variedContent = ContentVariation.varyListFormat(items);
     console.log(`\nVaried content:\n${variedContent}`);
+
+    // Mention rate limiter example
+    const mentionLimiter = new MentionRateLimiter({
+      cooldownSeconds: 3600,
+      botHandle: "@solvrbot",
+    });
+
+    // Cache display names (from X API)
+    mentionLimiter.cacheDisplayName("bankrbot", "Bankr");
+    mentionLimiter.cacheDisplayName("virtuals_io", "Virtuals Protocol");
+
+    // First mention — allowed
+    const text1 = mentionLimiter.process("Check out @bankrbot for trading!");
+    console.log(`\nFirst mention: ${text1}`);
+    // -> "Check out @bankrbot for trading!"
+
+    // Second mention within cooldown — replaced with display name
+    const text2 = mentionLimiter.process("Also try @bankrbot for swaps!");
+    console.log(`Second mention: ${text2}`);
+    // -> "Also try Bankr for swaps!"
   })();
 }

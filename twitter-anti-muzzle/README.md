@@ -48,23 +48,51 @@ def format_reply(text):
     return text
 ```
 
-### Layer 1.5: Minimize @Mentions in AI Responses
+### Layer 1.5: Rate-Limit @Mentions (Use Display Names on Cooldown)
 
-**Even without auto-injection, AI responses should be conservative with @mentions.**
+**Even without auto-injection, AI-generated replies can contain @handles.** X's anti-spam system flags bots that repeatedly tag other accounts. The solution: rate-limit each @handle to once per hour, and replace with the account's display name when on cooldown.
 
-If your bot uses an LLM (Claude, GPT, etc.), add this to your system prompt:
+```python
+import re
+import time
 
+_mention_cooldowns: dict[str, float] = {}  # @handle -> last used timestamp
+_MENTION_COOLDOWN_SECS = 3600  # 1 hour per handle
+_display_name_cache: dict[str, str] = {}  # @handle -> display name
+
+def rate_limit_mentions(text: str, bot_handle: str = "@mybot") -> str:
+    """Replace @mentions with display names when on cooldown."""
+    now = time.time()
+
+    def _replace(match: re.Match) -> str:
+        handle = match.group(0)
+        handle_lower = handle.lower()
+
+        # Never tag yourself
+        if handle_lower == bot_handle.lower():
+            return _display_name_cache.get(handle_lower, handle[1:])
+
+        last_used = _mention_cooldowns.get(handle_lower, 0)
+        if now - last_used < _MENTION_COOLDOWN_SECS:
+            # On cooldown — use display name or username without @
+            return _display_name_cache.get(handle_lower, handle[1:])
+        else:
+            # Allow mention, start cooldown
+            _mention_cooldowns[handle_lower] = now
+            return handle
+
+    return re.sub(r'@([A-Za-z0-9_]{1,15})\b', _replace, text)
 ```
-X ANTI-MUZZLE POLICY:
-- Minimize @mentions in replies. Only tag when ABSOLUTELY necessary
-- NEVER tag project accounts unless user specifically requests it
-- Use plain text names instead (e.g. "Virtuals Protocol" not "@virtuals_io")
-- Exception: Tagging creators/builders when directly relevant is OK
-- When in doubt, DON'T tag - use plain text
-```
 
-**Why this matters:**
-Even "natural" @mentions can trigger spam detection if they're frequent. Be conservative.
+**Before:** `"Check out @bankrbot for trading!"` → `"Check out @bankrbot for trading!"` (first time)
+**After cooldown:** `"Check out @bankrbot for trading!"` → `"Check out Bankr for trading!"` (display name)
+
+**Populate the cache** from X API responses (`user_fields: ["username", "name"]`):
+```python
+# When fetching mentions, cache display names from included users
+for user in response.includes["users"]:
+    _display_name_cache[f"@{user.username.lower()}"] = user.name
+```
 
 ### Layer 2: Randomize Timing
 
@@ -165,10 +193,11 @@ def add_intro_variety(base_text):
 ### Quick Start
 
 1. **Audit your code** for automatic @mention injection → Remove it
-2. **Add delays** before posting (3-8s randomized)
-3. **Implement rate limiting** (5/hour for humans, 1/hour for bots)
-4. **Randomize timing** for chained posts (8-15s between tweets)
-5. **Vary response formats** to avoid repetitive patterns
+2. **Rate-limit @mentions** in outgoing replies (1 per handle per hour, use display names on cooldown)
+3. **Add delays** before posting (3-8s randomized)
+4. **Implement rate limiting** (5/hour for humans, 1/hour for bots)
+5. **Randomize timing** for chained posts (8-15s between tweets)
+6. **Vary response formats** to avoid repetitive patterns
 
 ### Testing
 

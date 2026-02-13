@@ -136,6 +136,91 @@ class AntiMuzzle:
         logger.info(f"Removed VIP: {user_id}")
 
 
+class MentionRateLimiter:
+    """Rate-limit @mentions in outgoing reply text to avoid muzzling.
+
+    Each @handle can only be mentioned once per cooldown period. When on
+    cooldown, the @handle is replaced with the account's display name
+    (or username without the @ if display name is unknown).
+
+    Battle-tested on @solvrbot — this is the #1 defense against muzzling.
+    """
+
+    def __init__(
+        self,
+        cooldown_seconds: int = 3600,
+        bot_handle: str = "@solvrbot",
+    ):
+        """
+        Args:
+            cooldown_seconds: How long before a handle can be @mentioned again (default: 1 hour)
+            bot_handle: Your bot's handle (always stripped from replies)
+        """
+        self.cooldown_seconds = cooldown_seconds
+        self.bot_handle = bot_handle.lower()
+        self._cooldowns: dict[str, float] = {}  # handle_lower -> last_mentioned
+        self._display_names: dict[str, str] = {}  # handle_lower -> display name
+
+    def cache_display_name(self, username: str, display_name: str):
+        """Cache a display name for a handle (populate from X API responses).
+
+        Call this when processing mentions — X API includes user data with
+        user_fields=["username", "name"].
+        """
+        self._display_names[f"@{username.lower()}"] = display_name
+
+    def cache_from_api_users(self, users: list[dict]):
+        """Bulk-cache display names from X API user includes.
+
+        Args:
+            users: List of user dicts with 'username' and 'name' keys
+        """
+        for user in users:
+            username = user.get("username", "")
+            name = user.get("name", username)
+            if username:
+                self._display_names[f"@{username.lower()}"] = name
+
+    def process(self, text: str) -> str:
+        """Rate-limit @mentions in outgoing text.
+
+        Args:
+            text: The reply text to process
+
+        Returns:
+            Text with rate-limited @mentions replaced by display names
+        """
+        if not text:
+            return text
+
+        import re
+        now = time.time()
+
+        def _replace(match: re.Match) -> str:
+            handle = match.group(0)  # e.g. "@bankrbot"
+            handle_lower = handle.lower()
+
+            # Never tag ourselves
+            if handle_lower == self.bot_handle:
+                username = handle[1:]
+                return self._display_names.get(handle_lower, username)
+
+            last_used = self._cooldowns.get(handle_lower, 0)
+            if now - last_used < self.cooldown_seconds:
+                # On cooldown — use display name or just username without @
+                username = handle[1:]
+                replacement = self._display_names.get(handle_lower, username)
+                logger.debug(f"Mention rate-limited: {handle} -> {replacement}")
+                return replacement
+            else:
+                # Allow this mention and start cooldown
+                self._cooldowns[handle_lower] = now
+                logger.debug(f"Mention allowed: {handle} (cooldown started)")
+                return handle
+
+        return re.sub(r'@([A-Za-z0-9_]{1,15})\b', _replace, text)
+
+
 class ContentVariation:
     """Utilities for varying response content to avoid repetitive patterns."""
 
@@ -258,5 +343,25 @@ if __name__ == "__main__":
 
         varied_content = ContentVariation.vary_list_format(items)
         print(f"\nVaried content:\n{varied_content}")
+
+        # Mention rate limiter example
+        mention_limiter = MentionRateLimiter(
+            cooldown_seconds=3600,
+            bot_handle="@solvrbot",
+        )
+
+        # Cache display names (from X API)
+        mention_limiter.cache_display_name("bankrbot", "Bankr")
+        mention_limiter.cache_display_name("virtuals_io", "Virtuals Protocol")
+
+        # First mention — allowed
+        text1 = mention_limiter.process("Check out @bankrbot for trading!")
+        print(f"\nFirst mention: {text1}")
+        # -> "Check out @bankrbot for trading!"
+
+        # Second mention within cooldown — replaced with display name
+        text2 = mention_limiter.process("Also try @bankrbot for swaps!")
+        print(f"Second mention: {text2}")
+        # -> "Also try Bankr for swaps!"
 
     asyncio.run(example())

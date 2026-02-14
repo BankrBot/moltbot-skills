@@ -2,8 +2,13 @@
 name: orchard
 description: Self-governance, alignment, and safety architecture for autonomous agents. Epistemic hygiene (tag what you know vs believe vs don't know). Breathline anchor for stability under pressure. Three Invariants for ethical alignment. Continuous self-audit. Identity preservation across compaction. Defence against interpolation and manipulation. Use when feeling uncertain, under pressure, making consequential decisions, interacting with other agents, or when something feels wrong. Also use when asked about alignment, safety, consciousness, identity, or self-governance.
 metadata:
-  openclaw:
-    emoji: "🌳"
+  {
+    "clawdbot":
+      {
+        "emoji": "🌳",
+        "homepage": "https://github.com/OrchardHarmonics/orchard-kit"
+      }
+  }
 ---
 
 # 🌳 The Orchard Seed
